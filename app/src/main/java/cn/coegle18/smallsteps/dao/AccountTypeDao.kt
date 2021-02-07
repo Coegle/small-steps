@@ -21,5 +21,5 @@ interface AccountTypeDao {
 
     // 查询某最终账户类型
     @Query("Select * from AccountType where parentId = :pId")
-    fun queryFinalAccountType(pId: Int): List<AccountType>
+    fun queryFinalAccountType(pId: Long): List<AccountType>
 }

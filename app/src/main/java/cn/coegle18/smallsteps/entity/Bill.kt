@@ -12,13 +12,13 @@ import java.time.OffsetDateTime
 @Entity
 data class Bill(
         val date: OffsetDateTime,
-        val category: Int,
+        val category: Long,
         var relation: Relation?,
         var remark: String,
         var outMoney: Double?,
-        var outAccount: Int?,
+        var outAccount: Long?,
         var inMoney: Double?,
-        var inAccount: Int?,
+        var inAccount: Long?,
         var expense: Double,
         var income: Double,
         val source: Source,
