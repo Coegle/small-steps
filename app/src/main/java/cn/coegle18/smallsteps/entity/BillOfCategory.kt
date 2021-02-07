@@ -9,5 +9,5 @@ data class BillOfCategory(
                 parentColumn = "categoryId",
                 entityColumn = "category"
         )
-        val accounts: List<Account>
+        val bills: List<Bill>
 )
