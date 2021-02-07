@@ -50,10 +50,10 @@ class Converter {
     fun fromVisible(value: Visible) = value.name
 
     @TypeConverter
-    fun toRelation(value: String) = enumValueOf<Relation>(value)
+    fun toRelation(value: String?) = value?.let { enumValueOf<Relation>(it) }
 
     @TypeConverter
-    fun fromRelation(value: Relation) = value.name
+    fun fromRelation(value: Relation?) = value?.name
 
     @TypeConverter
     fun toSource(value: String) = enumValueOf<Source>(value)
