@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/overviewFragment">
+
+    <fragment
+        android:id="@+id/overviewFragment"
+        android:name="cn.coegle18.smallsteps.fragment.OverviewFragment"
+        android:label="概览"
+        tools:layout="@layout/fragment_overview">
+        <action
+            android:id="@+id/addBillAction"
+            app:destination="@id/editBillFragment"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/billsFragment"
+        android:name="cn.coegle18.smallsteps.fragment.BillsFragment"
+        android:label="账单"
+        tools:layout="@layout/fragment_bills">
+        <action
+            android:id="@+id/showPieChartAction"
+            app:destination="@id/pieChartFragment" />
+        <action
+            android:id="@+id/editBillActionFromBills"
+            app:destination="@id/editBillFragment" />
+        <action
+            android:id="@+id/editSplitBillFromBills"
+            app:destination="@id/splitBillFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/assetsFragment"
+        android:name="cn.coegle18.smallsteps.fragment.AssetsFragment"
+        android:label="资产"
+        tools:layout="@layout/fragment_assets">
+        <action
+            android:id="@+id/showAssetDetailAction"
+            app:destination="@id/assetDetailFragment" />
+        <action
+            android:id="@+id/selectNewAssetAction"
+            app:destination="@id/addAssetsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editBillFragment"
+        android:name="cn.coegle18.smallsteps.fragment.EditBillFragment"
+        android:label="记一笔"
+        tools:layout="@layout/fragment_add_bill">
+        <argument
+            android:name="billInfo"
+            app:argType="cn.coegle18.smallsteps.entity.Bill"
+            app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/pieChartFragment"
+        android:name="cn.coegle18.smallsteps.fragment.PieChartFragment"
+        android:label="报表"
+        tools:layout="@layout/fragment_pie_chart">
+        <action
+            android:id="@+id/showBillsAction"
+            app:destination="@id/billsFragment" />
+        <action
+            android:id="@+id/showPieChartDetailAction"
+            app:destination="@id/pieChartDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/assetDetailFragment"
+        android:name="cn.coegle18.smallsteps.fragment.AssetDetailFragment"
+        android:label="账户详情"
+        tools:layout="@layout/fragment_asset_detail">
+        <action
+            android:id="@+id/editAssetAction"
+            app:destination="@id/editAssetFragment" />
+        <action
+            android:id="@+id/editBillActionzFromAsset"
+            app:destination="@id/editBillFragment" />
+        <action
+            android:id="@+id/editSplitBillFromAsset"
+            app:destination="@id/splitBillFragment" />
+        <argument
+            android:name="accountInfo"
+            app:argType="cn.coegle18.smallsteps.entity.Account" />
+    </fragment>
+    <fragment
+        android:id="@+id/editAssetFragment"
+        android:name="cn.coegle18.smallsteps.fragment.EditAssetFragment"
+        android:label="编辑账户"
+        tools:layout="@layout/fragment_edit_asset">
+        <argument
+            android:name="accountInfo"
+            app:argType="cn.coegle18.smallsteps.entity.AccountList" />
+        <action
+            android:id="@+id/addSuccessAction"
+            app:destination="@id/assetsFragment"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/assetsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addAssetsFragment"
+        android:name="cn.coegle18.smallsteps.fragment.AddAssetsFragment"
+        android:label="添加资产"
+        tools:layout="@layout/fragment_add_assets">
+        <action
+            android:id="@+id/addAssetAction"
+            app:destination="@id/editAssetFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:popEnterAnim="@android:anim/slide_in_left" />
+        <action
+            android:id="@+id/showSecondViewAction"
+            app:destination="@id/addAssetsSecondViewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/categoryFragment"
+        android:name="cn.coegle18.smallsteps.fragment.CategoryFragment"
+        android:label="分类"
+        tools:layout="@layout/fragment_category">
+        <action
+            android:id="@+id/editCategoryAction"
+            app:destination="@id/editCategoryFragment" />
+        <action
+            android:id="@+id/addCategoryAction"
+            app:destination="@id/editCategoryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/pieChartDetailFragment"
+        android:name="cn.coegle18.smallsteps.fragment.PieChartDetailFragment"
+        android:label="分类明细"
+        tools:layout="@layout/fragment_pie_chart_detail">
+        <action
+            android:id="@+id/editBillActionFromCategory"
+            app:destination="@id/editBillFragment" />
+        <action
+            android:id="@+id/editSplitBillFromCategory"
+            app:destination="@id/splitBillFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editCategoryFragment"
+        android:name="cn.coegle18.smallsteps.fragment.EditCategoryFragment"
+        android:label="fragment_edit_category"
+        tools:layout="@layout/fragment_edit_category" />
+    <fragment
+        android:id="@+id/splitBillFragment"
+        android:name="cn.coegle18.smallsteps.fragment.SplitBillFragment"
+        android:label="拆分账单"
+        tools:layout="@layout/fragment_split_bill" />
+    <fragment
+        android:id="@+id/subAddAssetsFragment"
+        android:name="cn.coegle18.smallsteps.fragment.SubAddAssetsFragment"
+        android:label="fragment_sub_add_assets"
+        tools:layout="@layout/fragment_sub_add_assets" />
+    <fragment
+        android:id="@+id/addAssetsSecondViewFragment"
+        android:name="cn.coegle18.smallsteps.fragment.AddAssetsSecondViewFragment"
+        android:label="添加资产"
+        tools:layout="@layout/fragment_add_assets_second_view">
+        <action
+            android:id="@+id/addAssetAction"
+            app:destination="@id/editAssetFragment" />
+        <argument
+            android:name="pAccountType"
+            app:argType="cn.coegle18.smallsteps.entity.AccountType" />
+    </fragment>
+</navigation>
