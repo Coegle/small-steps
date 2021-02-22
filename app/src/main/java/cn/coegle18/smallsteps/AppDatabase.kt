@@ -12,7 +12,7 @@ import cn.coegle18.smallsteps.entity.*
 @Database(
     version = 1,
     entities = [Account::class, AccountType::class, Category::class, Bill::class, RelationOfBills::class],
-    views = [BillList::class]
+    views = [BillList::class, AccountList::class]
 )
 @TypeConverters(Converter::class)
 abstract class AppDatabase : RoomDatabase() {
