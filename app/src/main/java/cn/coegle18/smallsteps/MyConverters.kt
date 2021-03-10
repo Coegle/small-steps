@@ -1,6 +1,8 @@
 package cn.coegle18.smallsteps
 
+import android.os.Parcelable
 import androidx.room.TypeConverter
+import kotlinx.android.parcel.Parcelize
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
@@ -20,10 +22,10 @@ class Converter {
     fun fromPrimaryAccountType(value: PrimaryAccountType) = value.name
 
     @TypeConverter
-    fun toMainAccountType(value: String) = enumValueOf<MainAccountType>(value)
+    fun toMainAccountType(value: String?) = value?.let { enumValueOf<MainAccountType>(it) }
 
     @TypeConverter
-    fun fromMainAccountType(value: MainAccountType) = value.name
+    fun fromMainAccountType(value: MainAccountType?) = value?.name
 
     @TypeConverter
     fun toTradeType(value: String) = enumValueOf<TradeType>(value)
@@ -78,40 +80,43 @@ enum class BaseAccountType {
 }
 
 // 在用户添加账户时，作为首要的四类账户类型在一级视图进行展示：AccountType
-enum class PrimaryAccountType {
-    MONEY, // 资金账户
-    INVESTMENT, // 投资账户
-    RECEIVABLE, // 应收账户
-    PAYABLE // 应付帐户
+@Parcelize
+enum class PrimaryAccountType(val caption: String) : Parcelable {
+    MONEY("资金"), // 资金账户
+    INVESTMENT("投资"), // 投资账户
+    RECEIVABLE("应收"), // 应收账户
+    PAYABLE("应付") // 应付帐户
 }
 
 // 最终的账户类型：AccountType Category
-enum class MainAccountType {
-    DEPOSIT_CARD, // 储蓄卡
-    CASH, // 现金
-    ALI_PAY, // 支付宝
-    SCHOOL_CARD, // 校园卡
-    WECHAT_PAY, // 微信支付
-    CUSTOM, // 用户自定义类型
-    INVESTMENT, // 投资
-    LEND, // 借出
-    REIMBURSEMENT, // 报销
-    REFUND, // 退款
-    CREDIT_CARD, // 信用卡
-    BORROW; // 借入
+enum class MainAccountType(val caption: String) {
+    DEPOSIT_CARD("储蓄卡"),
+    CASH("现金"),
+    ALI_PAY("支付宝"),
+    SCHOOL_CARD("校园卡"),
+    WECHAT_PAY("微信支付"),
+    CUSTOM("自定义"),
+    INVESTMENT("投资"),
+    LEND("借出"),
+    REIMBURSEMENT("报销"),
+    REFUND("退款"),
+    CREDIT_CARD("信用卡"),
+    BORROW("借入");
 }
 
 // 复式记账中的实际交易类型 Category
-enum class TradeType {
-    INCOME, // 收入
-    EXPENSE, // 支出
-    TRANSFER; // 转账
+@Parcelize
+enum class TradeType(val caption: String) : Parcelable {
+    EXPENSE("支出"),
+    INCOME("收入"),
+    TRANSFER("转账");
 }
 
 // 基于流水账，对于用户显示的交易类型 Category
-enum class DisplayTradeType {
-    INCOME, // 收入
+@Parcelize
+enum class DisplayTradeType : Parcelable {
     EXPENSE, // 支出
+    INCOME, // 收入
     NONE, // 无（转账）
 }
 
