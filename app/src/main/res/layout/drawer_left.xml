@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.navigation.NavigationView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer"
+    android:layout_width="256dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:fitsSystemWindows="true"
+    app:headerLayout="@layout/drawer_left_layout"
+    app:itemTextAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+    app:menu="@menu/drawer_left_menu">
+
+</com.google.android.material.navigation.NavigationView>
