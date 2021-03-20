@@ -10,9 +10,9 @@ import cn.coegle18.smallsteps.dao.*
 import cn.coegle18.smallsteps.entity.*
 
 @Database(
-    version = 1,
-    entities = [Account::class, AccountType::class, Category::class, Bill::class, RelationOfBills::class],
-    views = [BillList::class, AccountList::class]
+        version = 1,
+        entities = [Account::class, AccountType::class, Category::class, Bill::class, RelationOfBills::class],
+        views = [BillView::class, AccountView::class, CategoryView::class]
 )
 @TypeConverters(Converter::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -32,10 +32,10 @@ abstract class AppDatabase : RoomDatabase() {
                 return it
             }
             return Room.databaseBuilder(
-                context.applicationContext,
-                AppDatabase::class.java, "app_database"
+                    context.applicationContext,
+                    AppDatabase::class.java, "app_database"
             )
-                .createFromAsset("app_database_v1.db")
+                    .createFromAsset("app_database.db")
                 .fallbackToDestructiveMigration()
                 .build().apply {
                     instance = this

@@ -34,12 +34,6 @@ class Converter {
     fun fromTradeType(value: TradeType) = value.name
 
     @TypeConverter
-    fun toDisplayTradeType(value: String) = enumValueOf<DisplayTradeType>(value)
-
-    @TypeConverter
-    fun fromDisplayTradeType(value: DisplayTradeType) = value.name
-
-    @TypeConverter
     fun toEditable(value: String) = enumValueOf<Editable>(value)
 
     @TypeConverter
@@ -89,7 +83,8 @@ enum class PrimaryAccountType(val caption: String) : Parcelable {
 }
 
 // 最终的账户类型：AccountType Category
-enum class MainAccountType(val caption: String) {
+@Parcelize
+enum class MainAccountType(val caption: String) : Parcelable {
     DEPOSIT_CARD("储蓄卡"),
     CASH("现金"),
     ALI_PAY("支付宝"),
@@ -110,14 +105,6 @@ enum class TradeType(val caption: String) : Parcelable {
     EXPENSE("支出"),
     INCOME("收入"),
     TRANSFER("转账");
-}
-
-// 基于流水账，对于用户显示的交易类型 Category
-@Parcelize
-enum class DisplayTradeType : Parcelable {
-    EXPENSE, // 支出
-    INCOME, // 收入
-    NONE, // 无（转账）
 }
 
 // 分类是否可以使用 Category
