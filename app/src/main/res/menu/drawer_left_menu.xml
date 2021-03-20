@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_reimbursement_management"
+        android:title="@string/reimbursement_management" />
+    <item
+        android:id="@+id/navigation_category_management"
+        android:title="@string/category_management" />
+    <item
+        android:id="@+id/navigation_import"
+        android:title="@string/bill_import" />
+    <item
+        android:id="@+id/navigation_export"
+        android:title="@string/bill_export" />
+</menu>
