@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/firstLayer"
+        android:drawable="@drawable/ic_category_expense_63"
+        android:height="32dp"
+        android:width="32dp" />
+</layer-list>
