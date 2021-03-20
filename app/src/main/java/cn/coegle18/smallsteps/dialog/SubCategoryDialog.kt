@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import cn.coegle18.smallsteps.R
 import cn.coegle18.smallsteps.TradeType
 import cn.coegle18.smallsteps.adapter.CategoryListAdapter
-import cn.coegle18.smallsteps.viewmodel.SubCategoryViewModel
+import cn.coegle18.smallsteps.viewmodel.SubCategoryDialogViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.dialog_bottom_sheet.*
 
@@ -19,7 +19,7 @@ private const val SUB_INCOME_CATEGORY = "subIncomeCategory"
 private const val SUB_EXPENSE_CATEGORY = "subExpenseCategory"
 
 class SubCategoryDialog : BottomSheetDialogFragment() {
-    lateinit var viewModel: SubCategoryViewModel
+    lateinit var viewModel: SubCategoryDialogViewModel
     private val args: SubCategoryDialogArgs by navArgs()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.dialog_bottom_sheet, container, false)
@@ -27,7 +27,7 @@ class SubCategoryDialog : BottomSheetDialogFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(SubCategoryViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(SubCategoryDialogViewModel::class.java)
         val mAdapter = CategoryListAdapter()
         viewModel.pCategoryView.value = args.pCategory
         viewModel.subCategoryList.observe(viewLifecycleOwner) {
