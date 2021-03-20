@@ -5,6 +5,7 @@ import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
@@ -12,11 +13,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import cn.coegle18.smallsteps.*
+import cn.coegle18.smallsteps.activity.OverviewActivity
 import cn.coegle18.smallsteps.adapter.CategoryIconAdapter
 import cn.coegle18.smallsteps.adapter.IconSetting
 import cn.coegle18.smallsteps.dao.CategoryDao
 import cn.coegle18.smallsteps.entity.Category
-import kotlinx.android.synthetic.main.fragment_edit_asset.titleText
+import cn.coegle18.smallsteps.util.ActivityUtil
 import kotlinx.android.synthetic.main.fragment_edit_category.*
 import java.util.*
 import kotlin.concurrent.thread
@@ -46,11 +48,7 @@ class EditCategoryFragment : Fragment() {
     }
 
     private fun fillAndUploadData(name: String, icon: String) {
-        val tradeType = when (args.displayTradeType) {
-            DisplayTradeType.EXPENSE -> TradeType.EXPENSE
-            DisplayTradeType.INCOME -> TradeType.INCOME
-            DisplayTradeType.NONE -> TradeType.TRANSFER
-        }
+        val tradeType = args.displayTradeType
         // todo order 该怎么填
         when {
             isNewPCategory -> {
@@ -78,12 +76,12 @@ class EditCategoryFragment : Fragment() {
 
     private fun getCandidateIconList() {
         when (args.displayTradeType) {
-            DisplayTradeType.INCOME -> {
+            TradeType.INCOME -> {
                 repeat(Constants.incomeIconNum) {
                     iconList.add(IconSetting("ic_bg_green", "ic_category_income_${it + 1}"))
                 }
             }
-            DisplayTradeType.EXPENSE -> {
+            TradeType.EXPENSE -> {
                 repeat(Constants.expenseIconNum) {
                     iconList.add(IconSetting("ic_bg_red", "ic_category_expense_${it + 1}"))
                 }
@@ -118,16 +116,18 @@ class EditCategoryFragment : Fragment() {
         isNewCCategory = args.isNewCategory && args.pCategory != null && args.cCategory == null
         isOldPCategory = !args.isNewCategory && args.pCategory != null && args.cCategory == null
         isOldCCategory = !args.isNewCategory && args.pCategory != null && args.cCategory != null
+
+        if (isNewCCategory || isNewPCategory) (requireActivity() as OverviewActivity).setActionBarTitle("添加分类")
         // 填充分类名称和图标
         when {
             isOldPCategory -> {
                 val category = args.pCategory
-                titleText.text = category!!.name
+                titleText.setText(category!!.name)
                 icon = "ic_category_${category.displayTradeType.name.toLowerCase(Locale.ROOT)}_${category.icon}"
             }
             isOldCCategory -> {
                 val category = args.cCategory
-                titleText.text = category!!.name
+                titleText.setText(category!!.name)
                 icon = "ic_category_${category.displayTradeType.name.toLowerCase(Locale.ROOT)}_${category.icon}"
             }
         }
@@ -164,8 +164,11 @@ class EditCategoryFragment : Fragment() {
                 val name = titleText.text.toString()
                 if (name != "" && name.length <= 4) {
                     fillAndUploadData(name, icon.split('_')[3])
-                    // todo 键盘收回
+                    ActivityUtil.hideSoftKeyBoard(requireActivity())
                     findNavController().navigateUp()
+                } else {
+                    if (name == "") Toast.makeText(requireContext(), "分类名不能为空", Toast.LENGTH_SHORT).show()
+                    else if (name.length > 4) Toast.makeText(requireContext(), "分类名不能超过四个字符", Toast.LENGTH_SHORT).show()
                 }
                 true
             }
