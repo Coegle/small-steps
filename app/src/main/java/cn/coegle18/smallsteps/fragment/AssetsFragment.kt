@@ -9,7 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.coegle18.smallsteps.R
 import cn.coegle18.smallsteps.adapter.AccountAdapter
-import cn.coegle18.smallsteps.entity.AccountList
+import cn.coegle18.smallsteps.entity.AccountView
 import cn.coegle18.smallsteps.viewmodel.AssetsViewModel
 import kotlinx.android.synthetic.main.fragment_assets.*
 import kotlinx.android.synthetic.main.item_headline6.*
@@ -39,18 +39,18 @@ class AssetsFragment : Fragment() {
             adapter = mAdapter
         }
 
-        mAdapter.setOnItemClickListener { adapter, view, position ->
+        mAdapter.setOnItemClickListener { _, _, position ->
             val accountSection = viewModel.accountSection[position]
             if (!accountSection.isHeader) {
                 val action =
-                    AssetsFragmentDirections.showAssetDetailAction(accountSection.data as AccountList)
+                    AssetsFragmentDirections.showAssetDetailAction(accountSection.data as AccountView)
                 findNavController().navigate(action)
             }
         }
 
         // 更新视图
         viewModel.allVisibleAccountList.observe(viewLifecycleOwner, {
-            Log.d("livedata", "allAccountsOfAccountType, ${it.toString()}")
+            Log.d("LiveData", "allAccountsOfAccountType, $it")
             viewModel.group(it)
             mAdapter.setList(viewModel.accountSection)
         })

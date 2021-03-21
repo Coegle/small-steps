@@ -20,8 +20,9 @@ class ExpenseBillViewModel(application: Application) : AndroidViewModel(applicat
     val displayList = MediatorLiveData<List<CategoryWithDefaultSelection>>()
 
     // 分类
-    var selectedCategoryId = MutableLiveData(Constants.defaultCategoryId)
-    var categoryView = Transformations.switchMap(selectedCategoryId) { categoryDao.querySingleCategoryView(it) }
+    var selectedCategoryId = MutableLiveData(Constants.defaultCategoryMap[TradeType.EXPENSE]!!)
+    var categoryView =
+        Transformations.switchMap(selectedCategoryId) { categoryDao.querySingleCategoryView(it) }
 
     init {
         displayList.addSource(categoryList) {
@@ -34,11 +35,12 @@ class ExpenseBillViewModel(application: Application) : AndroidViewModel(applicat
 
     // 账户
     var accountId = MutableLiveData(Constants.defaultAccountId)
-    var accountView = Transformations.switchMap(accountId) { accountDao.queryAccount(it) }
+    var accountView = Transformations.switchMap(accountId) { accountDao.queryAccountView(it) }
 
     // 关联的账户
     var relatedAccountId = MutableLiveData(0L)
-    var relatedAccount = Transformations.switchMap(relatedAccountId) { accountDao.queryAccount(it) }
+    var relatedAccount =
+        Transformations.switchMap(relatedAccountId) { accountDao.queryAccountView(it) }
 
     // 时间
     var newDateTime: OffsetDateTime = OffsetDateTime.ofInstant(Calendar.getInstance().toInstant(), TimeZone.getDefault().toZoneId())

@@ -5,18 +5,18 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import cn.coegle18.smallsteps.AppDatabase
 import cn.coegle18.smallsteps.PrimaryAccountType
-import cn.coegle18.smallsteps.entity.AccountList
 import cn.coegle18.smallsteps.entity.AccountSection
+import cn.coegle18.smallsteps.entity.AccountView
 
 
 class AssetsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val accountDao = AppDatabase.getDatabase(application).accountDao()
-    val allVisibleAccountList: LiveData<List<AccountList>> = accountDao.queryAccountList()
+    val allVisibleAccountList: LiveData<List<AccountView>> = accountDao.queryAccountViewList()
     var accountSection: List<AccountSection> = emptyList<AccountSection>().toMutableList()
 
     // 更新视图
-    fun group(list: List<AccountList>) {
+    fun group(list: List<AccountView>) {
         accountSection = emptyList<AccountSection>().toMutableList()
         for (type in PrimaryAccountType.values()) {
 

@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import cn.coegle18.smallsteps.*
+import cn.coegle18.smallsteps.activity.OverviewActivity
 import cn.coegle18.smallsteps.adapter.CategoryGridAdapter
 import cn.coegle18.smallsteps.entity.Bill
 import cn.coegle18.smallsteps.entity.BillView
@@ -39,7 +40,7 @@ private const val BILL_INFO = "BillInfo"
 private const val SUB_EXPENSE_CATEGORY = "subExpenseCategory"
 private const val ACCOUNT_ID = "account_id"
 private const val ACCOUNT = "account"
-private const val RELATED_ACCOUNT = "related_account"
+private const val RELATED_ACCOUNT = "relatedAccount"
 
 class ExpenseBillFragment : Fragment() {
 
@@ -74,7 +75,7 @@ class ExpenseBillFragment : Fragment() {
             }
         }
         viewModel.categoryView.observe(viewLifecycleOwner) {
-            changeRelateAccount(it.tradeType)
+            changeRelateAccount(it.tradeType, it.relatedAccountType)
         }
         // 设置点击事件的监听
         mAdapter.setOnItemClickListener { _, _, position ->
@@ -116,9 +117,16 @@ class ExpenseBillFragment : Fragment() {
         }
 
         accountInfoLayout.setOnClickListener {
-            val array = arrayOf(MainAccountType.ALI_PAY, MainAccountType.CASH, MainAccountType.DEPOSIT_CARD,
-                    MainAccountType.WECHAT_PAY, MainAccountType.SCHOOL_CARD, MainAccountType.CUSTOM, MainAccountType.CREDIT_CARD)
-            val action = EditBillFragmentDirections.selectAccountAction(array)
+            val array = arrayOf(
+                MainAccountType.ALI_PAY,
+                MainAccountType.CASH,
+                MainAccountType.DEPOSIT_CARD,
+                MainAccountType.WECHAT_PAY,
+                MainAccountType.SCHOOL_CARD,
+                MainAccountType.CUSTOM,
+                MainAccountType.CREDIT_CARD
+            )
+            val action = EditBillFragmentDirections.selectAccountAction(array, ACCOUNT)
             findNavController().navigate(action)
         }
 
@@ -178,7 +186,7 @@ class ExpenseBillFragment : Fragment() {
     }
 
     // 关联账户设置
-    private fun changeRelateAccount(tradeType: TradeType) {
+    private fun changeRelateAccount(tradeType: TradeType, relatedAccountType: MainAccountType?) {
         // 可报销
         if (tradeType == TradeType.EXPENSE) {
             if (billInfoArg?.inAccountMainAccountType == MainAccountType.REIMBURSEMENT && viewModel.relatedAccountId.value == billInfoArg?.inAccountId && relateBtn.isChecked) { // 旧账单刚进来且是可报销且未报销
@@ -197,26 +205,30 @@ class ExpenseBillFragment : Fragment() {
 
             relateAccountBtn.setOnClickListener {
                 val array = arrayOf(MainAccountType.REIMBURSEMENT)
-                val action = EditBillFragmentDirections.selectAccountAction(array)
+                val action = EditBillFragmentDirections.selectAccountAction(array, RELATED_ACCOUNT)
                 findNavController().navigate(action)
             }
         }
         // 其他
         else {
-            if (billInfoArg?.inAccountMainAccountType != null && billInfoArg?.inAccountMainAccountType != MainAccountType.REIMBURSEMENT && viewModel.relatedAccountId.value == billInfoArg?.inAccountId && relateBtn.isChecked) { // 旧账单刚进来且是可报销
+            if (billInfoArg?.inAccountMainAccountType == relatedAccountType && viewModel.relatedAccountId.value == billInfoArg?.inAccountId && relateBtn.isChecked) { // 旧账单刚进来
                 Log.d("action", "其他：旧账单信息没变")
                 relateBtn.visibility = View.GONE
                 relateAccountBtn.visibility = View.VISIBLE
             } else {
                 Log.d("action", "其他：其他")
-                viewModel.relatedAccountId.value = Constants.defaultAccountMap[viewModel.categoryView.value?.relatedAccountType]
+                viewModel.relatedAccountId.value =
+                    Constants.defaultAccountMap[viewModel.categoryView.value?.relatedAccountType]
                 relateBtn.isChecked = true
                 relateBtn.visibility = View.GONE
                 relateAccountBtn.visibility = View.VISIBLE
             }
             relateAccountBtn.setOnClickListener {
                 val accountTypeArray = arrayOf(viewModel.categoryView.value?.relatedAccountType!!)
-                val action = EditBillFragmentDirections.selectAccountAction(accountTypeArray)
+                val action = EditBillFragmentDirections.selectAccountAction(
+                    accountTypeArray,
+                    RELATED_ACCOUNT
+                )
                 findNavController().navigate(action)
             }
         }
@@ -288,6 +300,9 @@ class ExpenseBillFragment : Fragment() {
                     }
                     findNavController().navigateUp()
                 } else {
+                    balanceText.setText("")
+                    (requireActivity() as OverviewActivity).vibratePhone()
+                    Toast.makeText(requireContext(), "添加成功", Toast.LENGTH_SHORT).show()
                     thread {
                         viewModel.billDao.insertBill(bill)
                     }
@@ -329,7 +344,7 @@ class ExpenseBillFragment : Fragment() {
     }
 
     private fun init() {
-        if (billInfoArg != null) {
+        if (billInfoArg != null && billInfoArg!!.displayTradeType == TradeType.EXPENSE) {
             balanceText.setText(billInfoArg!!.outMoney.toString())
             if (billInfoArg!!.inAccountMainAccountType != null && billInfoArg!!.inAccountMainAccountType == MainAccountType.REIMBURSEMENT) {
                 Log.d("action", "设置报销关联账户")
