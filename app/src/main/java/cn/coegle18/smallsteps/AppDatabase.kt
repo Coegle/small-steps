@@ -11,7 +11,7 @@ import cn.coegle18.smallsteps.entity.*
 
 @Database(
         version = 1,
-        entities = [Account::class, AccountType::class, Category::class, Bill::class, RelationOfBills::class],
+        entities = [Account::class, AccountType::class, Category::class, Bill::class, RelationOfBills::class, Calendar::class],
         views = [BillView::class, AccountView::class, CategoryView::class]
 )
 @TypeConverters(Converter::class)
