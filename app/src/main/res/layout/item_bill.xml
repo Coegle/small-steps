@@ -1,173 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/bill_item"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
-    android:layout_alignParentStart="true"
-    android:layout_alignParentTop="true">
+    android:layout_height="64dp">
 
-    <ImageView
-        android:id="@+id/categoryImage"
-        android:background="@drawable/ic_bg_green"
-        tools:srcCompat="@drawable/ic_category_income_2"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="16dp"
-        android:layout_centerVertical="true" />
-
-    <!-- detailFrame-->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/detailFrame"
+    <RelativeLayout
+        android:id="@+id/bill_item"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="match_parent"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="64dp">
+        android:layout_alignParentTop="true">
 
-        <!-- leftFrame-->
+        <ImageView
+            android:id="@+id/categoryImage"
+            android:background="@drawable/ic_bg_green"
+            tools:srcCompat="@drawable/ic_category_income_2"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="16dp"
+            android:layout_centerVertical="true" />
+
+        <!-- detailFrame-->
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/leftFrame"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:id="@+id/detailFrame"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="64dp">
 
-            <!-- mainFrame-->
+            <!-- leftFrame-->
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/mainframe"
+                android:id="@+id/leftFrame"
                 android:layout_width="wrap_content"
-                android:layout_height="24dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <TextView
-                    android:id="@+id/categoryText"
+                <!-- mainFrame-->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/mainframe"
                     android:layout_width="wrap_content"
                     android:layout_height="24dp"
-                    android:gravity="center_vertical"
-                    android:text="工资"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <TextView
-                    android:id="@+id/reimburseText"
-                    android:layout_height="wrap_content"
+                    <TextView
+                        android:id="@+id/categoryText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="24dp"
+                        android:gravity="center_vertical"
+                        android:text="工资"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/reimburseText"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="可报销"
+                        android:background="@drawable/shape_rectangle_imported"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/categoryText"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:paddingLeft="4dip"
+                        android:paddingRight="4dip"
+                        android:paddingTop="1dip"
+                        android:paddingBottom="1dip" />
+
+                    <TextView
+                        android:id="@+id/splitText"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="拆分"
+                        android:background="@drawable/shape_rectangle_imported"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/reimburseText"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:paddingLeft="4dip"
+                        android:paddingRight="4dip"
+                        android:paddingTop="1dip"
+                        android:paddingBottom="1dip" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- subFrame -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/subFrame"
                     android:layout_width="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="可报销"
-                    android:background="@drawable/shape_rectangle_imported"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/categoryText"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:paddingLeft="4dip"
-                    android:paddingRight="4dip"
-                    android:paddingTop="1dip"
-                    android:paddingBottom="1dip" />
+                    android:layout_height="16dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/mainframe">
 
-                <TextView
-                    android:id="@+id/splitText"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="拆分"
-                    android:background="@drawable/shape_rectangle_imported"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/reimburseText"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:paddingLeft="4dip"
-                    android:paddingRight="4dip"
-                    android:paddingTop="1dip"
-                    android:paddingBottom="1dip" />
-
-
+                    <!-- dateText -->
+                    <TextView
+                        android:id="@+id/dateText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="16dp"
+                        android:text="1月11日"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                    <!-- remarkText -->
+                    <TextView
+                        android:id="@+id/remarkText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="16dp"
+                        android:layout_marginStart="8dp"
+                        android:text="夏雨园 ·1313"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/dateText"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_goneMarginStart="0dp" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- subFrame -->
+            <!-- rightFrame -->
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/subFrame"
+                android:id="@+id/rightFrame"
                 android:layout_width="wrap_content"
-                android:layout_height="16dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/mainframe">
-
-                <!-- dateText -->
-                <TextView
-                    android:id="@+id/dateText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="16dp"
-                    android:text="1月11日"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-                <!-- remarkText -->
-                <TextView
-                    android:id="@+id/remarkText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="16dp"
-                    android:layout_marginStart="8dp"
-                    android:text="夏雨园 ·1313"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/dateText"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_goneMarginStart="0dp" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <!-- rightFrame -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/rightFrame"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginEnd="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/refundText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:layout_marginEnd="8dp"
-                android:text="(已退￥20)"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                android:visibility="visible"
-                app:layout_constraintEnd_toStartOf="@+id/moneyText"
-                app:layout_constraintBaseline_toBaselineOf="@id/moneyText" />
-
-            <TextView
-                android:id="@+id/moneyText"
-                android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:lineSpacingExtra="1sp"
-                android:text="@string/moneyText"
-                android:textAlignment="textEnd"
-                android:textAppearance="@style/moneyText"
-                app:layout_constraintBottom_toTopOf="@+id/accountText"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/accountText"
-                android:layout_width="wrap_content"
-                android:layout_height="16dp"
-                android:layout_below="@id/moneyText"
-                android:layout_alignParentEnd="true"
-                android:lineSpacingExtra="0sp"
-                android:text="南京理工大学"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                android:layout_height="40dp"
+                android:layout_marginEnd="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/moneyText" />
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/refundText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginEnd="8dp"
+                    android:text="(已退￥20)"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toStartOf="@+id/moneyText"
+                    app:layout_constraintBaseline_toBaselineOf="@id/moneyText" />
+
+                <TextView
+                    android:id="@+id/moneyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:lineSpacingExtra="1sp"
+                    android:text="@string/moneyText"
+                    android:textAlignment="textEnd"
+                    android:textAppearance="@style/moneyText"
+                    app:layout_constraintBottom_toTopOf="@+id/accountText"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/accountText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="16dp"
+                    android:layout_below="@id/moneyText"
+                    android:layout_alignParentEnd="true"
+                    android:lineSpacingExtra="0sp"
+                    android:text="南京理工大学"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/moneyText" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</RelativeLayout>
+    </RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,6 @@
 package cn.coegle18.smallsteps.fragment
 
+import android.app.Application
 import android.os.Bundle
 import android.view.*
 import androidx.core.view.get
@@ -8,9 +9,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import cn.coegle18.smallsteps.R
 import cn.coegle18.smallsteps.activity.OverviewActivity
+import cn.coegle18.smallsteps.adapter.BillByMonthAdapter
+import cn.coegle18.smallsteps.adapter.MonthSubNode
 import cn.coegle18.smallsteps.viewmodel.AssetDetailViewModel
+import cn.coegle18.smallsteps.viewmodel.DetailViewModelFactory
 import kotlinx.android.synthetic.main.fragment_asset_detail.*
 import kotlinx.android.synthetic.main.item_btn_two.*
 
@@ -28,7 +33,7 @@ class AssetDetailFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(AssetDetailViewModel::class.java)
+        viewModel = ViewModelProvider(this, DetailViewModelFactory(Application(), args.accountInfo.accountId)).get(AssetDetailViewModel::class.java)
         balanceText.text = "￥${args.accountInfo.balance}"
         (requireActivity() as OverviewActivity).setActionBarTitle(args.accountInfo.name)
         if (args.accountInfo.autoImport) {
@@ -41,6 +46,25 @@ class AssetDetailFragment : Fragment() {
             setOnClickListener {
                 val action = AssetDetailFragmentDirections.editBillActionzFromAsset(null, args.accountInfo.accountId)
                 findNavController().navigate(action)
+            }
+        }
+
+        val mAdapter = BillByMonthAdapter()
+        recyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = mAdapter
+        }
+        viewModel.displayDataList.observe(viewLifecycleOwner) {
+            mAdapter.setList(it)
+        }
+        mAdapter.addChildClickViewIds(R.id.bill_item)
+        mAdapter.setOnItemChildClickListener { adapter, view, position ->
+            if (view.id == R.id.bill_item) {
+                val bill = (adapter.data[position] as MonthSubNode).node
+                if (bill != null) {
+                    val action = AssetDetailFragmentDirections.editBillActionzFromAsset(bill, args.accountInfo.accountId)
+                    findNavController().navigate(action)
+                }
             }
         }
     }
