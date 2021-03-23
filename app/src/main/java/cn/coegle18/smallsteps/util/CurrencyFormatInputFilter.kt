@@ -41,4 +41,5 @@ class ActivityUtil {
 
 object Util {
     val balanceFormatter = DecimalFormat("0.00")
+    val balanceFormatterSimple = DecimalFormat("0.##")
 }
