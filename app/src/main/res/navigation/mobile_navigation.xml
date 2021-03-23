@@ -12,9 +12,7 @@
         tools:layout="@layout/fragment_overview">
         <action
             android:id="@+id/addBillAction"
-            app:destination="@id/editBillFragment"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+            app:destination="@id/editBillFragment" />
     </fragment>
     <fragment
         android:id="@+id/billsFragment"
@@ -47,11 +45,20 @@
         android:id="@+id/editBillFragment"
         android:name="cn.coegle18.smallsteps.fragment.EditBillFragment"
         android:label="记一笔"
-        tools:layout="@layout/fragment_add_bill">
+        tools:layout="@layout/fragment_edit_bill">
         <argument
             android:name="billInfo"
-            app:argType="cn.coegle18.smallsteps.entity.Bill"
+            app:argType="cn.coegle18.smallsteps.entity.BillView"
             app:nullable="true" />
+        <action
+            android:id="@+id/selectSubCategoryAction"
+            app:destination="@id/subCategoryDialog" />
+        <argument
+            android:name="newAccountId"
+            app:argType="long" />
+        <action
+            android:id="@+id/selectAccountAction"
+            app:destination="@id/accountDialog" />
     </fragment>
     <fragment
         android:id="@+id/pieChartFragment"
@@ -81,21 +88,24 @@
             app:destination="@id/splitBillFragment" />
         <argument
             android:name="accountInfo"
-            app:argType="cn.coegle18.smallsteps.entity.Account" />
+            app:argType="cn.coegle18.smallsteps.entity.AccountView" />
     </fragment>
     <fragment
         android:id="@+id/editAssetFragment"
         android:name="cn.coegle18.smallsteps.fragment.EditAssetFragment"
         android:label="编辑账户"
         tools:layout="@layout/fragment_edit_asset">
-        <argument
-            android:name="accountInfo"
-            app:argType="cn.coegle18.smallsteps.entity.AccountList" />
         <action
             android:id="@+id/addSuccessAction"
             app:destination="@id/assetsFragment"
             app:popUpToInclusive="true"
             app:popUpTo="@id/assetsFragment" />
+        <argument
+            android:name="accountId"
+            app:argType="long" />
+        <argument
+            android:name="accountType"
+            app:argType="long" />
     </fragment>
     <fragment
         android:id="@+id/addAssetsFragment"
@@ -117,11 +127,11 @@
         android:label="分类"
         tools:layout="@layout/fragment_category">
         <action
-            android:id="@+id/editCategoryAction"
-            app:destination="@id/editCategoryFragment" />
-        <action
             android:id="@+id/addCategoryAction"
             app:destination="@id/editCategoryFragment" />
+        <action
+            android:id="@+id/showMoreEditAction"
+            app:destination="@id/bottomSheetDialog" />
     </fragment>
     <fragment
         android:id="@+id/pieChartDetailFragment"
@@ -138,8 +148,23 @@
     <fragment
         android:id="@+id/editCategoryFragment"
         android:name="cn.coegle18.smallsteps.fragment.EditCategoryFragment"
-        android:label="fragment_edit_category"
-        tools:layout="@layout/fragment_edit_category" />
+        android:label="编辑分类"
+        tools:layout="@layout/fragment_edit_category">
+        <argument
+            android:name="pCategory"
+            app:argType="cn.coegle18.smallsteps.entity.Category"
+            app:nullable="true" />
+        <argument
+            android:name="cCategory"
+            app:argType="cn.coegle18.smallsteps.entity.Category"
+            app:nullable="true" />
+        <argument
+            android:name="displayTradeType"
+            app:argType="cn.coegle18.smallsteps.TradeType" />
+        <argument
+            android:name="isNewCategory"
+            app:argType="boolean" />
+    </fragment>
     <fragment
         android:id="@+id/splitBillFragment"
         android:name="cn.coegle18.smallsteps.fragment.SplitBillFragment"
@@ -162,4 +187,52 @@
             android:name="pAccountType"
             app:argType="cn.coegle18.smallsteps.entity.AccountType" />
     </fragment>
+    <dialog
+        android:id="@+id/bottomSheetDialog"
+        android:name="cn.coegle18.smallsteps.dialog.BottomSheetDialog"
+        android:label="BottomSheetDialog">
+        <argument
+            android:name="pCategory"
+            app:argType="cn.coegle18.smallsteps.entity.Category"
+            app:nullable="true" />
+        <argument
+            android:name="cCategory"
+            app:argType="cn.coegle18.smallsteps.entity.Category"
+            app:nullable="true" />
+        <argument
+            android:name="displayTradeType"
+            app:argType="cn.coegle18.smallsteps.TradeType" />
+        <argument
+            android:name="isNewCategory"
+            app:argType="boolean" />
+        <action
+            android:id="@+id/editCategoryAction"
+            app:destination="@id/editCategoryFragment" />
+        <argument
+            android:name="isSubCategory"
+            app:argType="boolean" />
+    </dialog>
+    <dialog
+        android:id="@+id/subCategoryDialog"
+        android:name="cn.coegle18.smallsteps.dialog.SubCategoryDialog"
+        android:label="SubCategoryDialog">
+        <argument
+            android:name="pCategory"
+            app:argType="cn.coegle18.smallsteps.entity.CategoryView" />
+    </dialog>
+    <fragment
+        android:id="@+id/expenseBillFragment"
+        android:name="cn.coegle18.smallsteps.fragment.ExpenseBillFragment"
+        android:label="ExpenseBillFragment" />
+    <dialog
+        android:id="@+id/accountDialog"
+        android:name="cn.coegle18.smallsteps.dialog.AccountDialog"
+        android:label="AccountDialog">
+        <argument
+            android:name="accountType"
+            app:argType="cn.coegle18.smallsteps.MainAccountType[]" />
+        <argument
+            android:name="source"
+            app:argType="string" />
+    </dialog>
 </navigation>
