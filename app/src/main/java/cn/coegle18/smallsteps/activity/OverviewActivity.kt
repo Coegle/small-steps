@@ -1,6 +1,9 @@
 package cn.coegle18.smallsteps.activity
 
+import android.content.Context
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
@@ -61,6 +64,10 @@ class OverviewActivity : AppCompatActivity() {
         }
     }
 
+    fun setActionBarTitle(title: String) {
+        toolbar.title = title
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         AppDatabase.getDatabase(applicationContext).close()
@@ -70,5 +77,10 @@ class OverviewActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
+    }
+
+    fun vibratePhone(time: Long = 50) {
+        val vibrator = applicationContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        vibrator.vibrate(VibrationEffect.createOneShot(time, VibrationEffect.DEFAULT_AMPLITUDE))
     }
 }
