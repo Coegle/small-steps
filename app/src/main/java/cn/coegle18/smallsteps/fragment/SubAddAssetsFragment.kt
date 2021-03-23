@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import cn.coegle18.smallsteps.PrimaryAccountType
 import cn.coegle18.smallsteps.R
 import cn.coegle18.smallsteps.adapter.AddAccountAdapter
-import cn.coegle18.smallsteps.entity.AccountView
 import cn.coegle18.smallsteps.viewmodel.SubAddAssetsViewModel
 import cn.coegle18.smallsteps.viewmodel.SubAddAssetsViewModelFactory
 import kotlinx.android.synthetic.main.fragment_sub_add_assets.*
@@ -46,10 +45,8 @@ class SubAddAssetsFragment : Fragment() {
             if (accountType != null) {
                 if (accountType.finalType) {
                     // 添加账户
-                    val newAccount = AccountView(null, accountType.baseAccountType, accountType.primaryAccountType,
-                            accountType.mainAccountType, accountType.name, accountType.icon, accountType.autoImport, accountType.custom, accountType.hint,
-                            accountType.accountTypeId, 0L, accountType.name, true, 0L, 0.0, "")
-                    val action = AddAssetsFragmentDirections.addAssetAction(newAccount)
+                    val action =
+                        AddAssetsFragmentDirections.addAssetAction(0L, accountType.accountTypeId)
                     findNavController().navigate(action)
                 } else {
                     // 转到二级视图

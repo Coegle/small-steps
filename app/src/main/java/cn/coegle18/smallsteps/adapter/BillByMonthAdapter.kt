@@ -4,6 +4,7 @@ import android.view.View
 import cn.coegle18.smallsteps.MainAccountType
 import cn.coegle18.smallsteps.R
 import cn.coegle18.smallsteps.TradeType
+import cn.coegle18.smallsteps.Visible
 import cn.coegle18.smallsteps.entity.BillView
 import cn.coegle18.smallsteps.util.Util
 import com.chad.library.adapter.base.BaseNodeAdapter
@@ -85,25 +86,33 @@ class MonthSubNodeProvider() : BaseNodeProvider() {
                     setGone(R.id.reimburseText, true)
                 }
 
-                when (data.tradeType) {
-                    TradeType.INCOME -> {
+                when {
+                    data.visible == Visible.SYSTEM -> { // 调整账户余额
+                        setGone(R.id.moneyText, true)
+                        setBackgroundResource(R.id.categoryImage, R.drawable.ic_bg_brown)
+                        setGone(R.id.accountText, true)
+                    }
+                    data.tradeType == TradeType.INCOME -> {
+                        setGone(R.id.moneyText, false)
                         setText(R.id.moneyText, "￥${Util.balanceFormatter.format(data.inMoney)}")
                         setBackgroundResource(R.id.categoryImage, R.drawable.ic_bg_green)
                         setTextColor(R.id.moneyText, context.getColor(R.color.green))
-                        setText(R.id.accountText, data.inAccountName)
+                        setGone(R.id.accountText, true)
                     }
-                    TradeType.EXPENSE -> {
+                    data.tradeType == TradeType.EXPENSE -> {
+                        setGone(R.id.moneyText, false)
                         setText(R.id.moneyText, "￥${Util.balanceFormatter.format(data.outMoney)}")
                         setBackgroundResource(R.id.categoryImage, R.drawable.ic_bg_red)
                         setTextColor(R.id.moneyText, context.getColor(R.color.red))
-                        setText(R.id.accountText, data.outAccountName)
+                        setGone(R.id.accountText, true)
                     }
-                    TradeType.TRANSFER -> {
+                    data.tradeType == TradeType.TRANSFER -> {
+                        setGone(R.id.moneyText, false)
                         setText(R.id.moneyText, "￥${Util.balanceFormatter.format(data.outMoney)}")
                         setBackgroundResource(R.id.categoryImage, R.drawable.ic_bg_brown)
                         setTextColor(
-                                R.id.moneyText,
-                                context.getColor(R.color.material_on_background_emphasis_high_type)
+                            R.id.moneyText,
+                            context.getColor(R.color.material_on_background_emphasis_high_type)
                         )
                         setText(R.id.accountText, "${data.outAccountName} -> ${data.inAccountName}")
                     }
@@ -113,17 +122,19 @@ class MonthSubNodeProvider() : BaseNodeProvider() {
     }
 
     private fun setCategoryIcon(holder: BaseViewHolder, data: BillView) {
-        holder.setImageResource(
-                R.id.categoryImage, context.resources.getIdentifier(
-                "ic_category_${data.tradeType.name.toLowerCase(Locale.ROOT)}_${
-                    if (data.categoryCId != null) {
-                        data.categoryCIcon
-                    } else {
-                        data.categoryPIcon
-                    }
-                }", "drawable", context.packageName
-        )
-        )
+        val resId = if (data.visible == Visible.SYSTEM) {
+            context.resources.getIdentifier(
+                "ic_category_${data.categoryPIcon}",
+                "drawable",
+                context.packageName
+            )
+        } else {
+            context.resources.getIdentifier(
+                "ic_category_${data.tradeType.name.toLowerCase(Locale.ROOT)}_${data.categoryCIcon ?: data.categoryPIcon}",
+                "drawable", context.packageName
+            )
+        }
+        holder.setImageResource(R.id.categoryImage, resId)
     }
 }
 

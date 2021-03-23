@@ -111,6 +111,7 @@ enum class TradeType(val caption: String) : Parcelable {
 enum class Visible {
     DISABLED, // 隐藏
     ENABLED, // 显示
+    SYSTEM, // 系统类型
     DEACTIVATED; // 停用
 }
 
@@ -133,5 +134,6 @@ enum class Source {
     MANUAL, // 手动记一笔
     IMPORTED, // 普通导入
     AUTO_IMPORTED, // 自动导入
-    SPLIT; // 拆分得到
+    SPLIT, // 拆分得到
+    SYSTEM; // 由于调整账户余额，需要平衡
 }

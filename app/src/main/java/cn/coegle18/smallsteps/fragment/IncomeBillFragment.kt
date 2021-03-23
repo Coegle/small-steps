@@ -11,10 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import cn.coegle18.smallsteps.Constants
-import cn.coegle18.smallsteps.MainAccountType
-import cn.coegle18.smallsteps.R
-import cn.coegle18.smallsteps.Source
+import cn.coegle18.smallsteps.*
 import cn.coegle18.smallsteps.activity.OverviewActivity
 import cn.coegle18.smallsteps.adapter.CategoryGridAdapter
 import cn.coegle18.smallsteps.entity.Bill
@@ -226,9 +223,20 @@ class IncomeBillFragment : Fragment() {
     private fun collectData(): Bill? {
         val balance = balanceText.text.toString().toDoubleOrNull()
         if (balance != null && balance != 0.0) {
-            val newBill = Bill(viewModel.newDateTime, viewModel.categoryView.value?.id!!, null, remarkText.text.toString(),
-                    null, null, balance, viewModel.accountId.value,
-                    0.0, balance, Source.MANUAL, true)
+            val newBill = Bill(
+                viewModel.newDateTime,
+                viewModel.categoryView.value?.id!!,
+                null,
+                remarkText.text.toString(),
+                null,
+                null,
+                balance,
+                viewModel.accountId.value,
+                0.0,
+                balance,
+                Source.MANUAL,
+                Visible.ENABLED
+            )
             if (relateAccountBtn.visibility == View.VISIBLE) {
                 Log.d("data", viewModel.relatedAccount.value.toString())
                 newBill.apply {
@@ -259,34 +267,66 @@ class IncomeBillFragment : Fragment() {
             // todo: 分类没有设置和账户没有设置的问题
             val bill = collectData()
             if (bill != null) {
-                if (billInfoArg != null) {
+                if (billInfoArg != null) { // 修改
                     bill.billId = billInfoArg!!.billId
                     thread {
                         viewModel.billDao.updateBill(bill)
+                        setNewBalance(
+                            billInfoArg?.outMoney,
+                            bill.outMoney,
+                            billInfoArg?.inMoney,
+                            bill.inMoney,
+                            bill.outAccount,
+                            bill.inAccount
+                        )
                     }
                     findNavController().navigateUp()
-                } else {
+                } else { // 再记一笔
                     balanceText.setText("")
                     (requireActivity() as OverviewActivity).vibratePhone()
                     Toast.makeText(requireContext(), "添加成功", Toast.LENGTH_SHORT).show()
                     thread {
                         viewModel.billDao.insertBill(bill)
+                        setNewBalance(
+                            null,
+                            bill.outMoney,
+                            null,
+                            bill.inMoney,
+                            bill.outAccount,
+                            bill.inAccount
+                        )
                     }
                 }
             }
         }
         // 删除或者保存
         deleteBtn.setOnClickListener {
-            if (billInfoArg != null) {
+            if (billInfoArg != null) { // 删除
                 thread {
                     viewModel.billDao.deleteBill(billInfoArg!!.billId)
+                    setNewBalance(
+                        billInfoArg?.outMoney,
+                        0.00,
+                        billInfoArg?.inMoney,
+                        0.00,
+                        billInfoArg?.outAccountId,
+                        billInfoArg?.inAccountId
+                    )
                 }
                 findNavController().navigateUp()
-            } else {
+            } else { // 保存
                 val bill = collectData()
                 if (bill != null) {
                     thread {
                         viewModel.billDao.insertBill(bill)
+                        setNewBalance(
+                            null,
+                            bill.outMoney,
+                            null,
+                            bill.inMoney,
+                            bill.outAccount,
+                            bill.inAccount
+                        )
                     }
                     findNavController().navigateUp()
                 }
@@ -340,5 +380,29 @@ class IncomeBillFragment : Fragment() {
         setRemarkCard()
         setBtn()
 
+    }
+
+    private fun setNewBalance(
+        oldOutMoney: Double?,
+        newOutMoney: Double?,
+        oldInMoney: Double?,
+        newInMoney: Double?,
+        outAccountId: Long?,
+        inAccountId: Long?
+    ) {
+        val inDifference = (newInMoney ?: 0.00) - (oldInMoney ?: 0.00)
+        val outDifference = (newOutMoney ?: 0.00) - (oldOutMoney ?: 0.00)
+        if (inDifference != 0.00) inAccountId?.let {
+            viewModel.accountDao.updateAccountBalance(
+                it,
+                inDifference
+            )
+        }
+        if (outDifference != 0.00) outAccountId?.let {
+            viewModel.accountDao.updateAccountBalance(
+                it,
+                -outDifference
+            )
+        }
     }
 }

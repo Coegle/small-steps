@@ -2,10 +2,7 @@ package cn.coegle18.smallsteps.entity
 
 import android.os.Parcelable
 import androidx.room.DatabaseView
-import cn.coegle18.smallsteps.MainAccountType
-import cn.coegle18.smallsteps.Relation
-import cn.coegle18.smallsteps.Source
-import cn.coegle18.smallsteps.TradeType
+import cn.coegle18.smallsteps.*
 import kotlinx.android.parcel.Parcelize
 import java.time.OffsetDateTime
 
@@ -30,7 +27,7 @@ import java.time.OffsetDateTime
                 "b.remark remark, " +
                 "outMoney, " +
                 "inMoney, " +
-                "imported, " +
+                "b.visible, " +
                 "date, " +
                 "source, " +
                 "expense, " +
@@ -66,9 +63,9 @@ data class BillView(
         val tradeType: TradeType,
         val displayTradeType: TradeType,
         val remark: String,
-        val outMoney: Double,
-        val inMoney: Double,
-        val imported: Boolean,
+        val outMoney: Double?,
+        val inMoney: Double?,
+        val visible: Visible,
         val date: OffsetDateTime,
         val source: Source,
         val expense: Double,
@@ -77,4 +74,23 @@ data class BillView(
         val splitFlag: Relation?,
         val refundFlag: Relation?,
         val reimbursementFlag: Relation?
-) : Parcelable
+) : Parcelable {
+        fun toBill(): Bill {
+                val bill = Bill(
+                        date,
+                        categoryCId ?: categoryPId,
+                        null,
+                        remark,
+                        outMoney,
+                        outAccountId,
+                        inMoney,
+                        inAccountId,
+                        expense,
+                        income,
+                        source,
+                        visible
+                )
+                bill.billId = billId
+                return bill
+        }
+}

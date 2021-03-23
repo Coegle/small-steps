@@ -5,6 +5,7 @@ import androidx.room.DatabaseView
 import cn.coegle18.smallsteps.BaseAccountType
 import cn.coegle18.smallsteps.MainAccountType
 import cn.coegle18.smallsteps.PrimaryAccountType
+import cn.coegle18.smallsteps.Visible
 import kotlinx.android.parcel.Parcelize
 
 @DatabaseView("select " +
@@ -41,8 +42,21 @@ data class AccountView(
         val accountTypeId: Long,
         val accountId: Long,
         val name: String,
-        val visible: Boolean,
+        val visible: Visible,
         val billNum: Long,
         val balance: Double,
         val remark: String
-) : Parcelable
+) : Parcelable {
+        fun toAccount(): Account {
+                val account = Account(
+                        accountTypeId,
+                        accountTypePName ?: accountTypeCName,
+                        visible,
+                        billNum,
+                        balance,
+                        remark
+                )
+                account.accountId = accountId
+                return account
+        }
+}

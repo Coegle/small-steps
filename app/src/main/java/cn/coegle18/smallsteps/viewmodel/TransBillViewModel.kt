@@ -10,7 +10,7 @@ import java.time.OffsetDateTime
 import java.util.*
 
 class TransBillViewModel(application: Application) : AndroidViewModel(application) {
-    private val accountDao = AppDatabase.getDatabase(application).accountDao()
+    val accountDao = AppDatabase.getDatabase(application).accountDao()
     val billDao = AppDatabase.getDatabase(application).billDao()
 
     val categoryId = Constants.defaultTransferCategoryId

@@ -11,9 +11,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.coegle18.smallsteps.R
+import cn.coegle18.smallsteps.Visible
 import cn.coegle18.smallsteps.activity.OverviewActivity
 import cn.coegle18.smallsteps.adapter.BillByMonthAdapter
 import cn.coegle18.smallsteps.adapter.MonthSubNode
+import cn.coegle18.smallsteps.util.Util
 import cn.coegle18.smallsteps.viewmodel.AssetDetailViewModel
 import cn.coegle18.smallsteps.viewmodel.DetailViewModelFactory
 import kotlinx.android.synthetic.main.fragment_asset_detail.*
@@ -61,11 +63,17 @@ class AssetDetailFragment : Fragment() {
         mAdapter.setOnItemChildClickListener { adapter, view, position ->
             if (view.id == R.id.bill_item) {
                 val bill = (adapter.data[position] as MonthSubNode).node
-                if (bill != null) {
-                    val action = AssetDetailFragmentDirections.editBillActionzFromAsset(bill, args.accountInfo.accountId)
+                if (bill != null && bill.visible != Visible.SYSTEM) {
+                    val action = AssetDetailFragmentDirections.editBillActionzFromAsset(
+                        bill,
+                        args.accountInfo.accountId
+                    )
                     findNavController().navigate(action)
                 }
             }
+        }
+        viewModel.accountBalance.observe(viewLifecycleOwner) {
+            balanceText.text = Util.balanceFormatter.format(it)
         }
     }
 
@@ -89,7 +97,10 @@ class AssetDetailFragment : Fragment() {
 
         return when (item.itemId) {
             R.id.rightIcon -> {
-                val action = AssetDetailFragmentDirections.editAssetAction(args.accountInfo)
+                val action = AssetDetailFragmentDirections.editAssetAction(
+                    args.accountInfo.accountId,
+                    args.accountInfo.accountTypeId
+                )
                 findNavController().navigate(action)
                 true
             }

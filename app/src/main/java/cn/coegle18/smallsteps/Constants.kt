@@ -16,6 +16,10 @@ class Constants {
             Pair(TradeType.EXPENSE, 2001L),
             Pair(TradeType.INCOME, 1001L)
         )
+        val defaultInitAccountCategoryMap = mapOf(
+            Pair(TradeType.EXPENSE, 2100L),
+            Pair(TradeType.INCOME, 1100L)
+        )
         const val defaultTransferCategoryId = 3001L
     }
 }

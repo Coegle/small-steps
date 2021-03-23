@@ -9,7 +9,6 @@ import cn.coegle18.smallsteps.AppDatabase
 import cn.coegle18.smallsteps.entity.AccountType
 
 class AddAssetsSecondViewModel(application: Application, pAccountType: AccountType) : AndroidViewModel(application) {
-    val pAccountType = pAccountType
     private val accountTypeDao = AppDatabase.getDatabase(application).accountTypeDao()
     val accountTypeList: LiveData<List<AccountType>> = accountTypeDao.queryFinalAccountType(pAccountType.accountTypeId)
 

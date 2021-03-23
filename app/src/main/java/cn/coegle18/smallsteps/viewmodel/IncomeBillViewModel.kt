@@ -13,7 +13,7 @@ import java.util.*
 
 class IncomeBillViewModel(application: Application) : AndroidViewModel(application) {
     private val categoryDao = AppDatabase.getDatabase(application).categoryDao()
-    private val accountDao = AppDatabase.getDatabase(application).accountDao()
+    val accountDao = AppDatabase.getDatabase(application).accountDao()
     val billDao = AppDatabase.getDatabase(application).billDao()
 
     val categoryList = categoryDao.queryPCategoryView(mutableListOf(Visible.ENABLED), TradeType.INCOME)

@@ -12,7 +12,6 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.coegle18.smallsteps.R
 import cn.coegle18.smallsteps.adapter.AddAccountAdapter
-import cn.coegle18.smallsteps.entity.AccountView
 import cn.coegle18.smallsteps.viewmodel.AddAssetsSecondViewModel
 import cn.coegle18.smallsteps.viewmodel.AddAssetsSecondViewModelFactory
 import kotlinx.android.synthetic.main.fragment_add_assets_second_view.*
@@ -34,12 +33,9 @@ class AddAssetsSecondViewFragment : Fragment() {
         val mAdapter = AddAccountAdapter(R.layout.item_add_asset, mutableListOf())
         mAdapter.setOnItemClickListener { _, _, position ->
             val accountType = viewModel.accountTypeList.value?.get(position)
-            val pAccountType = viewModel.pAccountType
             if (accountType != null) {
-                val accountList = AccountView(pAccountType.name, accountType.baseAccountType, accountType.primaryAccountType,
-                        accountType.mainAccountType, accountType.name, accountType.icon, accountType.autoImport, accountType.custom, accountType.hint,
-                        accountType.accountTypeId, 0L, accountType.name, true, 0, 0.0, "")
-                val action = AddAssetsFragmentDirections.addAssetAction(accountList)
+                val action =
+                    AddAssetsFragmentDirections.addAssetAction(0L, accountType.accountTypeId)
                 findNavController().navigate(action)
             }
         }

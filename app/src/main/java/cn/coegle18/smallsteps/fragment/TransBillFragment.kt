@@ -17,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import cn.coegle18.smallsteps.MainAccountType
 import cn.coegle18.smallsteps.R
 import cn.coegle18.smallsteps.Source
+import cn.coegle18.smallsteps.Visible
 import cn.coegle18.smallsteps.activity.OverviewActivity
 import cn.coegle18.smallsteps.entity.Bill
 import cn.coegle18.smallsteps.entity.BillView
@@ -256,9 +257,11 @@ class TransBillFragment : Fragment() {
         } else if (viewModel.inAccountId.value == viewModel.outAccountId.value) {
             Toast.makeText(context, "转入和转出的账户不能相等", Toast.LENGTH_SHORT).show()
         } else {
-            val newBill = Bill(viewModel.newDateTime, viewModel.categoryId, null, remarkText.text.toString(),
-                    balance, viewModel.outAccountId.value, balance, viewModel.inAccountId.value,
-                    0.0, 0.0, Source.MANUAL, true)
+            val newBill = Bill(
+                viewModel.newDateTime, viewModel.categoryId, null, remarkText.text.toString(),
+                balance, viewModel.outAccountId.value, balance, viewModel.inAccountId.value,
+                0.0, 0.0, Source.MANUAL, Visible.ENABLED
+            )
             Log.d("data", newBill.toString())
             return newBill
         }
@@ -279,13 +282,14 @@ class TransBillFragment : Fragment() {
             // todo: 分类没有设置和账户没有设置的问题
             val bill = collectData()
             if (bill != null) {
-                if (billInfoArg != null) {
+                if (billInfoArg != null) { // 保存修改
                     bill.billId = billInfoArg!!.billId
                     thread {
                         viewModel.billDao.updateBill(bill)
+                        setNewBalance(billInfoArg!!.outMoney, bill.outMoney!!)
                     }
                     findNavController().navigateUp()
-                } else {
+                } else { // 再记一笔
                     val outMoneyText = outAccount.findViewById<TextInputEditText>(R.id.balanceText)
                     outMoneyText.removeTextChangedListener(textWatcher)
                     outMoneyText.setText("")
@@ -293,6 +297,7 @@ class TransBillFragment : Fragment() {
                     viewModel.money.value = 0.0
                     thread {
                         viewModel.billDao.insertBill(bill)
+                        setNewBalance(null, bill.outMoney!!)
                     }
                     (requireActivity() as OverviewActivity).vibratePhone()
                     Toast.makeText(requireContext(), "添加成功", Toast.LENGTH_SHORT).show()
@@ -304,6 +309,7 @@ class TransBillFragment : Fragment() {
             if (billInfoArg != null) {
                 thread {
                     viewModel.billDao.deleteBill(billInfoArg!!.billId)
+                    setNewBalance(billInfoArg!!.outMoney, 0.00)
                 }
                 findNavController().navigateUp()
             } else {
@@ -311,6 +317,7 @@ class TransBillFragment : Fragment() {
                 if (bill != null) {
                     thread {
                         viewModel.billDao.insertBill(bill)
+                        setNewBalance(null, bill.outMoney!!)
                     }
                     findNavController().navigateUp()
                 }
@@ -332,5 +339,13 @@ class TransBillFragment : Fragment() {
             }
             remarkText.setText(billInfoArg?.remark)
         }
+    }
+
+    private fun setNewBalance(oldOutMoney: Double?, newOutMoney: Double) {
+        val difference = newOutMoney - (oldOutMoney ?: 0.00)
+        if (difference == 0.00) return
+        Log.d("difference: ", difference.toString())
+        viewModel.accountDao.updateAccountBalance(viewModel.inAccountId.value!!, difference)
+        viewModel.accountDao.updateAccountBalance(viewModel.outAccountId.value!!, -difference)
     }
 }

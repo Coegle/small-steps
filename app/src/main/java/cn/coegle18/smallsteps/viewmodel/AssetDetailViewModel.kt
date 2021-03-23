@@ -14,10 +14,13 @@ import java.time.format.DateTimeFormatter
 
 class AssetDetailViewModel(application: Application, accountId: Long) : AndroidViewModel(application) {
     private val billDao = AppDatabase.getDatabase(application).billDao()
+    private val accountDao = AppDatabase.getDatabase(application).accountDao()
 
+    private val account = accountDao.queryAccountView(accountId)
     private val monthSummaryList = billDao.queryExpenseByMonth(accountId)
     private val billList = billDao.queryBillList(listOf(accountId))
 
+    val accountBalance = Transformations.switchMap(account) { MutableLiveData(it.balance) }
     val displayDataList = MediatorLiveData<List<BaseNode>>()
 
     init {
@@ -38,6 +41,7 @@ class AssetDetailViewModel(application: Application, accountId: Long) : AndroidV
         val billList = billListLD.value
         if (billList == null || headerList == null) return emptyList()
         Log.d("data headerList", headerList.toString())
+        Log.d("data, billList", billList.toString())
         val retList = mutableListOf<BaseNode>()
         val map = billList.groupBy {
             it.date.format(DateTimeFormatter.ofPattern("yyyy-MM"))

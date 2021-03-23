@@ -4,10 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import cn.coegle18.smallsteps.MainAccountType
 import cn.coegle18.smallsteps.Visible
-import cn.coegle18.smallsteps.entity.Account
-import cn.coegle18.smallsteps.entity.AccountView
-import cn.coegle18.smallsteps.entity.BillInAccount
-import cn.coegle18.smallsteps.entity.BillOutAccount
+import cn.coegle18.smallsteps.entity.*
 
 @Dao
 interface AccountDao {
@@ -37,9 +34,20 @@ interface AccountDao {
 
     // 查询指定 MainAccountType 和可见性的账户列表
     @Query("Select * from AccountView where mainAccountType in (:accountTypeList) and visible in (:visible)")
-    fun queryAccountViewList(accountTypeList: List<MainAccountType>, visible: List<Visible> = listOf(Visible.ENABLED, Visible.DEACTIVATED)): LiveData<List<AccountView>>
+    fun queryAccountViewList(
+        accountTypeList: List<MainAccountType>,
+        visible: List<Visible> = listOf(Visible.ENABLED, Visible.SYSTEM)
+    ): LiveData<List<AccountView>>
 
     // 删除账户（将可见性设置为 DISABLED）
     @Query("update Account set visible = :visible where accountId = :accountId")
     fun deleteAccount(accountId: Long, visible: Visible = Visible.DISABLED)
+
+    // 查询 AccountTypeView
+    @Query("SELECT p.name as pName, c.name as cName, c.icon, c.custom, c.hint FROM accountType as c LEFT JOIN accountType as p ON c.parentId = p.accountTypeId WHERE c.accountTypeId = :accountTypeId OR (p.accountTypeId = :accountTypeId AND p.finalType = 1);")
+    fun queryAccountTypeView(accountTypeId: Long): LiveData<AccountTypeView>
+
+    // 更新指定账户的余额信息
+    @Query("Update Account set balance = balance + :difference where accountId = :accountId")
+    fun updateAccountBalance(accountId: Long, difference: Double)
 }

@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import cn.coegle18.smallsteps.Relation
 import cn.coegle18.smallsteps.Source
+import cn.coegle18.smallsteps.Visible
 import kotlinx.android.parcel.Parcelize
 import java.time.OffsetDateTime
 
@@ -25,7 +26,7 @@ data class Bill(
         var expense: Double,
         var income: Double,
         val source: Source,
-        var imported: Boolean
+        var visible: Visible
 ) : Parcelable {
         @PrimaryKey(autoGenerate = true)
         var billId: Long = 0
