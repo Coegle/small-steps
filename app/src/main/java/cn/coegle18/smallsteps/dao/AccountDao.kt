@@ -3,6 +3,7 @@ package cn.coegle18.smallsteps.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import cn.coegle18.smallsteps.MainAccountType
+import cn.coegle18.smallsteps.PrimaryAccountType
 import cn.coegle18.smallsteps.Visible
 import cn.coegle18.smallsteps.entity.*
 
@@ -50,4 +51,8 @@ interface AccountDao {
     // 更新指定账户的余额信息
     @Query("Update Account set balance = balance + :difference where accountId = :accountId")
     fun updateAccountBalance(accountId: Long, difference: Double)
+
+    // 查询指定主要账户类型的总金额
+    @Query("SELECT sum(balance) FROM AccountView WHERE primaryAccountType = :primaryAccountType AND visible in (:visible)")
+    fun queryTotalBalanceOfPrimaryAccountType(primaryAccountType: PrimaryAccountType, visible: List<Visible> = listOf(Visible.ENABLED, Visible.DEACTIVATED)): LiveData<Double>
 }

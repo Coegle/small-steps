@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="48dp"
+    android:background="@color/grey_1">
 
     <TextView
         android:id="@+id/headlineText"
@@ -18,12 +19,11 @@
     <Button
         android:id="@+id/button"
         style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:text="Button"
-
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/headlineText"
         app:layout_constraintTop_toTopOf="parent" />

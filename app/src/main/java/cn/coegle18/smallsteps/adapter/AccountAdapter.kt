@@ -3,6 +3,7 @@ package cn.coegle18.smallsteps.adapter
 import cn.coegle18.smallsteps.R
 import cn.coegle18.smallsteps.entity.AccountSection
 import cn.coegle18.smallsteps.entity.AccountView
+import cn.coegle18.smallsteps.util.Util
 import com.chad.library.adapter.base.BaseSectionQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
@@ -26,14 +27,14 @@ class AccountAdapter constructor(
             holder.setGone(R.id.caption, true)
         }
         holder.setImageResource(
-            R.id.accountIcon,
-            context.resources.getIdentifier(
-                "ic_fund_${account.icon}_white",
-                "drawable",
-                context.packageName
-            )
+                R.id.accountIcon,
+                context.resources.getIdentifier(
+                        "ic_fund_${account.icon}_white",
+                        "drawable",
+                        context.packageName
+                )
         )
-        holder.setText(R.id.balanceText, account.balance.toString())
+        holder.setText(R.id.balanceText, Util.balanceFormatter.format(account.balance))
     }
 
     /**
