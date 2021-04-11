@@ -25,8 +25,8 @@ interface CategoryDao {
     fun queryPCategoryView(visible: List<Visible>, displayTradeType: TradeType): LiveData<List<CategoryView>>
 
     // 查询指定状态的所有分类视图
-    @Query("Select * from CategoryView where visible in (:visible) and displayTradeType = :displayTradeType")
-    fun queryFullCategoryView(visible: List<Visible>, displayTradeType: TradeType): LiveData<List<CategoryView>>
+    @Query("Select * from CategoryView where visible in (:visible) and displayTradeType in(:displayTradeType)")
+    fun queryFullCategoryViewList(visible: List<Visible> = listOf(Visible.ENABLED, Visible.SYSTEM), displayTradeType: List<TradeType> = listOf(TradeType.INCOME, TradeType.EXPENSE)): LiveData<List<CategoryView>>
 
     // 查询指定状态的子分类
     @Query("Select * from Category where visible in (:visible) and parentId = :parentId")

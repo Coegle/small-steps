@@ -89,6 +89,9 @@
         <argument
             android:name="accountInfo"
             app:argType="cn.coegle18.smallsteps.entity.AccountView" />
+        <action
+            android:id="@+id/goToLoadingAction"
+            app:destination="@id/loadingDialog" />
     </fragment>
     <fragment
         android:id="@+id/editAssetFragment"
@@ -234,5 +237,19 @@
         <argument
             android:name="source"
             app:argType="string" />
+    </dialog>
+    <dialog
+        android:id="@+id/loadingDialog"
+        android:name="cn.coegle18.smallsteps.dialog.LoadingDialog"
+        android:label="LoadingDialog">
+        <argument
+            android:name="userId"
+            app:argType="string" />
+        <argument
+            android:name="password"
+            app:argType="string" />
+        <argument
+            android:name="accountId"
+            app:argType="long" />
     </dialog>
 </navigation>

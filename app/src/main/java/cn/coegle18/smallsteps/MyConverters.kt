@@ -58,10 +58,14 @@ class Converter {
     fun fromSource(value: Source) = value.name
 
     @TypeConverter
-    fun toOffsetDateTime(value: String) = formatter.parse(value, OffsetDateTime::from)
+    fun toOffsetDateTime(value: String?): OffsetDateTime? {
+        return value?.let {
+            return formatter.parse(value, OffsetDateTime::from)
+        }
+    }
 
     @TypeConverter
-    fun fromOffsetDateTime(date: OffsetDateTime): String = date.format(formatter)
+    fun fromOffsetDateTime(date: OffsetDateTime?): String? = date?.format(formatter)
 
 }
 
@@ -136,4 +140,34 @@ enum class Source {
     AUTO_IMPORTED, // 自动导入
     SPLIT, // 拆分得到
     SYSTEM; // 由于调整账户余额，需要平衡
+}
+
+enum class States(val caption: String, val state: Int) {
+    OPEN_WEB_PROGRESSING("打开网页中...", 0),
+    OPEN_WEB_SUCCESS("打开网页成功", 1),
+    OPEN_WEB_FAILED("打开网页失败", -1),
+
+    LOGIN_PROGRESSING("登录中...", 0),
+    LOGIN_SUCCESS("登录成功", 1),
+    LOGIN_FAILED("登录失败", -1),
+    LOGIN_FAILED_ERROR_PASS("用户名或密码错误", -1),
+
+    SESSION_ID_PROGRESSING("获取参数", 0),
+    SESSION_ID_SUCCESS("获取参数成功", 1),
+    SESSION_IS_FAILED("获取参数失败", -1),
+
+    OPEN_QUERY_PAGE_PROGRESSING("进入一卡通中心...", 0),
+    OPEN_QUERY_PAGE_SUCCESS("成功进入一卡通中心", 1),
+    OPEN_QUERY_PAGE_FAILED("进入一卡通中心失败", -1),
+
+    GET_TOTAL_PAGES_PROGRESSING("获取总页数中...", 0),
+    GET_TOTAL_PAGES_SUCCESS("获取总页数成功", 1),
+    GET_TOTAL_PAGES_FAILED("未能获取总页数", -1),
+
+    GET_BILLS_PROGRESSING("获取账单中...", 0),
+    GET_BILLS_SUCCESS("获取账单成功", 1),
+    GET_BILLS_FAILED("获取账单失败", -1),
+
+    SET_NEW_LATEST_TIME("设置最近获取的账单时间", 3),
+    FINISHED("完成", 2)
 }

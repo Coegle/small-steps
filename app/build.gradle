@@ -48,10 +48,25 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
 
+    // Charts
+    implementation 'com.diogobernardino:williamchart:3.10.1'
+    // Tooltips
+    implementation 'com.diogobernardino.williamchart:tooltip-slider:3.10.1'
+    implementation 'com.diogobernardino.williamchart:tooltip-points:3.10.1'
+
+    implementation 'com.afollestad.material-dialogs:core:3.3.0'
+    implementation 'com.afollestad.material-dialogs:input:3.3.0'
+    implementation 'com.afollestad.material-dialogs:bottomsheets:3.2.1'
+    implementation 'com.github.AAChartModel:AAChartCore-Kotlin:-SNAPSHOT'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    implementation 'org.jsoup:jsoup:1.13.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.1'
+    // csv file
+    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:0.15.1")
 
     def room_version = "2.2.6"
     implementation "androidx.room:room-runtime:${room_version}"
