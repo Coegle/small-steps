@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="HProgressView">
+        <attr name="progress" format="float" />
+        <!--水平方向边距-->
+        <attr name="h_margin" format="dimension" />
+        <attr name="progress_color" format="color" />
+        <attr name="normal_color" format="color" />
+        <!--进度条的纵向宽度-->
+        <attr name="progress_v_width" format="dimension" />
+        <attr name="text_to_progress_margin" format="dimension" />
+        <attr name="with_anim" format="boolean" />
+    </declare-styleable>
+</resources>

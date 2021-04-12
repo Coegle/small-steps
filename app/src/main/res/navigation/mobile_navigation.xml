@@ -67,6 +67,8 @@
         tools:layout="@layout/fragment_pie_chart">
         <action
             android:id="@+id/showBillsAction"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/billsFragment"
             app:destination="@id/billsFragment" />
         <action
             android:id="@+id/showPieChartDetailAction"
@@ -147,6 +149,13 @@
         <action
             android:id="@+id/editSplitBillFromCategory"
             app:destination="@id/splitBillFragment" />
+        <argument
+            android:name="categoryId"
+            app:argType="long" />
+        <argument
+            android:name="isParentCategory"
+            app:argType="boolean"
+            android:defaultValue="true" />
     </fragment>
     <fragment
         android:id="@+id/editCategoryFragment"

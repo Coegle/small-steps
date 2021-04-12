@@ -5,10 +5,12 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import cn.coegle18.smallsteps.TradeType
 import cn.coegle18.smallsteps.Visible
 import cn.coegle18.smallsteps.adapter.MonthHeader
 import cn.coegle18.smallsteps.entity.Bill
 import cn.coegle18.smallsteps.entity.BillView
+import cn.coegle18.smallsteps.entity.PieChartData
 import java.time.OffsetDateTime
 
 @Dao
@@ -43,7 +45,25 @@ interface BillDao {
 
     @Query("SELECT STRFTime(\"%Y\", c.dateList) as year, STRFTime(\"%m\", c.dateList) as month, SUM(b.expense) as outMoney FROM calendar AS c LEFT JOIN (SELECT date, expense FROM Bill WHERE visible in (:visible) and (inAccount = :accountId Or outAccount = :accountId) ) AS b ON c.dateList = DATE(b.date) WHERE c.dateList <= date(\"now\") AND c.dateList >= (SELECT MIN(DATE(minDate.`date`)) FROM Bill AS minDate where (inAccount = :accountId Or outAccount = :accountId)) GROUP BY STRFTime(\"%Y-%m\", c.dateList) ORDER BY dateList DESC")
     fun queryExpenseByMonth(
-        accountId: Long,
-        visible: List<Visible> = listOf(Visible.ENABLED, Visible.SYSTEM)
+            accountId: Long,
+            visible: List<Visible> = listOf(Visible.ENABLED, Visible.SYSTEM)
     ): LiveData<List<MonthHeader>>
+
+    @Query("SELECT " +
+            "c.id, " +
+            "c.pName as name, " +
+            "c.pIcon as icon, " +
+            "c.tradeType, " +
+            "sum(b.expense) as expense, " +
+            "round(sum(b.expense) / totalMoney.totalExp * 100) as expPer, " +
+            "sum(b.income) as income, " +
+            "round(sum(b.income) / totalInc * 100) as incPer, " +
+            "count(*) as billNum " +
+            "FROM " +
+            "CategoryView as c, " +
+            "BillView as b, " +
+            "(SELECT sum(expense) as totalExp, sum(income) as totalInc FROM BillView as tb WHERE tb.visible =:visible ) as totalMoney " +
+            "WHERE b.categoryPId = c.id AND c.tradeType =:tradeType AND b.visible = :visible " +
+            "GROUP BY c.id")
+    fun queryPPieChart(tradeType: TradeType, visible: Visible = Visible.ENABLED): LiveData<List<PieChartData>>
 }

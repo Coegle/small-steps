@@ -14,4 +14,6 @@
     <color name="bg_yellow_deep_2">#fffffbf5</color>
     <color name="grey_1">#EEEEEE</color>
     <color name="blue">#2F80ED</color>
+    <color name="progress_color">#ffff3c72</color>
+    <color name="progress_normal_color">#ffffd8e3</color>
 </resources>
