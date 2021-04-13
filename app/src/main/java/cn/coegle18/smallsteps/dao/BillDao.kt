@@ -66,4 +66,10 @@ interface BillDao {
             "WHERE b.categoryPId = c.id AND c.tradeType =:tradeType AND b.visible = :visible " +
             "GROUP BY c.id")
     fun queryPPieChart(tradeType: TradeType, visible: Visible = Visible.ENABLED): LiveData<List<PieChartData>>
+
+    @Query("SELECT * FROM BillView WHERE categoryPId = :categoryId OR categoryCId =:categoryId AND visible in (:visible) ORDER BY Datetime(date) DESC")
+    fun queryBillListByDate(categoryId: Long, visible: List<Visible> = listOf(Visible.ENABLED)): LiveData<List<BillView>>
+
+    @Query("SELECT * FROM BillView WHERE categoryPId = :categoryId OR categoryCId =:categoryId AND visible in (:visible) ORDER BY expense DESC, income DESC")
+    fun queryBillListByMoney(categoryId: Long, visible: List<Visible> = listOf(Visible.ENABLED)): LiveData<List<BillView>>
 }
