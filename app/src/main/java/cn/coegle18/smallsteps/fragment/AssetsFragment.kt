@@ -23,10 +23,6 @@ import kotlinx.android.synthetic.main.fragment_assets.*
 
 class AssetsFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = AssetsFragment()
-    }
-
     private lateinit var viewModel: AssetsViewModel
     private lateinit var mAdapter: AccountAdapter
     override fun onCreateView(
@@ -89,25 +85,25 @@ class AssetsFragment : Fragment() {
         val currency = headerCard.findViewById<View>(R.id.currency)
         val currencyMoney = setCardCompose(currency, "资金", R.color.green)
         viewModel.currencyMoney.observe(viewLifecycleOwner) {
-            currencyMoney.text = "￥" + Util.balanceFormatter.format(it)
+            currencyMoney.text = "￥" + Util.balanceFormatter.format(it ?: 0.00)
         }
 
         val fund = headerCard.findViewById<View>(R.id.fund)
         val fundMoney = setCardCompose(fund, "投资", R.color.blue)
         viewModel.fundMoney.observe(viewLifecycleOwner) {
-            fundMoney.text = "￥" + Util.balanceFormatter.format(it)
+            fundMoney.text = "￥" + Util.balanceFormatter.format(it ?: 0.00)
         }
 
         val lend = headerCard.findViewById<View>(R.id.lend)
         val lendMoney = setCardCompose(lend, "借出", R.color.red)
         viewModel.lendMoney.observe(viewLifecycleOwner) {
-            lendMoney.text = "￥" + Util.balanceFormatter.format(it)
+            lendMoney.text = "￥" + Util.balanceFormatter.format(it ?: 0.00)
         }
 
         val liability = headerCard.findViewById<View>(R.id.liability)
         val liabilityMoney = setCardCompose(liability, "负债", R.color.grey)
         viewModel.liabilityMoney.observe(viewLifecycleOwner) {
-            liabilityMoney.text = "￥" + Util.balanceFormatter.format(it)
+            liabilityMoney.text = "￥" + Util.balanceFormatter.format(it ?: 0.00)
         }
 
         val chartView = headerCard.findViewById<com.github.aachartmodel.aainfographics.aachartcreator.AAChartView>(R.id.chartView)
