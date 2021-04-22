@@ -6,7 +6,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -18,19 +20,22 @@ import cn.coegle18.smallsteps.entity.Bill
 import cn.coegle18.smallsteps.entity.BillView
 import cn.coegle18.smallsteps.entity.CategoryView
 import cn.coegle18.smallsteps.util.CurrencyFormatInputFilter
+import cn.coegle18.smallsteps.util.Util
 import cn.coegle18.smallsteps.viewmodel.IncomeBillViewModel
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.item_account_in_bill.*
+import kotlinx.android.synthetic.main.item_bill.*
 import kotlinx.android.synthetic.main.item_btn_two.*
 import kotlinx.android.synthetic.main.item_edit_bill_info.*
+import kotlinx.android.synthetic.main.item_edit_bill_info.remarkText
+import kotlinx.android.synthetic.main.item_related_bill_card.*
 import kotlinx.android.synthetic.main.layout_edit_bill_income.*
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.concurrent.thread
 import kotlin.properties.Delegates
 
 private const val BILL_INFO = "BillInfo"
@@ -77,7 +82,7 @@ class IncomeBillFragment : Fragment() {
         mAdapter.setOnItemClickListener { _, _, position ->
             val data = viewModel.categoryList.value?.get(position)!!
 
-            if (billInfoArg?.refundFlag != null || billInfoArg?.reimbursementFlag != null) {
+            if (viewModel.newRelatedBillId.value != 0L) {
                 MaterialAlertDialogBuilder(requireContext())
                         .setTitle("更改分类需要先取消关联的账单")
                         .setPositiveButton("确定") { _, _ -> }
@@ -173,6 +178,56 @@ class IncomeBillFragment : Fragment() {
         }
     }
 
+    // 绘制关联账单
+    private fun drawRelatedBillCard(data: BillView) {
+        relatedBillCardInclude.visibility = View.VISIBLE
+        relateAccountBtn.visibility = View.GONE
+        val categoryName = data.categoryPName + if (data.categoryCName != null) {
+            " - ${data.categoryCName}"
+        } else {
+            ""
+        }
+        categoryText.text = categoryName
+        categoryImage.setImageResource(
+                resources.getIdentifier(
+                        "ic_category_${data.tradeType.name.toLowerCase(Locale.ROOT)}_${
+                            if (data.categoryCId != null) {
+                                data.categoryCIcon
+                            } else {
+                                data.categoryPIcon
+                            }
+                        }", "drawable", requireContext().packageName
+                ))
+
+        dateText.text = "${data.date.monthValue}月${data.date.dayOfMonth}日"
+        val relatedBillRemark = relatedBillCardInclude.findViewById<View>(R.id.include).findViewById<TextView>(R.id.remarkText)
+        relatedBillRemark.text = data.remark
+        splitText.visibility = View.GONE
+        refundText.visibility = View.GONE
+        reimburseText.visibility = View.GONE
+        moneyText.text = "￥${Util.balanceFormatter.format(data.outMoney)}"
+        moneyText.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+        categoryImage.background = ContextCompat.getDrawable(requireContext(), R.drawable.ic_bg_red)
+        accountText.text = data.outAccountName
+    }
+
+    // 设置关联账单
+    private fun setRelatedBillCard() {
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<BillView>(REFUND_BILL)?.observe(viewLifecycleOwner) { result ->
+            Log.d("data", "relatedBill: $result")
+            viewModel.newRelatedBillId.value = result.billId
+        }
+        viewModel.relatedBillView.observe(viewLifecycleOwner) {
+            //Log.d("relatedBill", it.toString())
+            if (it != null) {
+                drawRelatedBillCard(it)
+            } else {
+                relateAccountBtn.visibility = View.VISIBLE
+                relatedBillCardInclude.visibility = View.GONE
+            }
+        }
+    }
+
     // 关联账户设置
     private fun changeRelateAccount(relatedAccountType: MainAccountType?) {
         if (relatedAccountType == null) {
@@ -180,14 +235,58 @@ class IncomeBillFragment : Fragment() {
         }
         // 可关联账单
         else if (relatedAccountType == MainAccountType.REFUND || relatedAccountType == MainAccountType.REIMBURSEMENT) {
+            viewModel.relatedAccountId.value = Constants.defaultAccountMap[relatedAccountType]
             relateAccountBtn.visibility = View.VISIBLE
+            reselectBtn.setOnClickListener {
+                val balance = balanceText.text.toString().toDoubleOrNull()
+                if (balance != null && balance != 0.0) {
+                    Log.d("Click", Util.balanceFormatter.format(balance))
+                    Log.d("Click", relatedAccountType.toString())
+                    val action = EditBillFragmentDirections.attachRefundBillAction(Util.balanceFormatter.format(balance), relatedAccountType)
+                    findNavController().navigate(action)
+                } else {
+                    Toast.makeText(requireContext(), "请先填写金额", Toast.LENGTH_SHORT).show()
+                }
+            }
+            disconnectBtn.setOnClickListener {
+                viewModel.newRelatedBillId.value = 0L
+            }
             if (billInfoArg?.outAccountMainAccountType != null && viewModel.relatedAccountId.value == billInfoArg?.outAccountId) { // 旧账单刚进来
                 Log.d("action", "旧的退款账单")
-                // todo 显示关联的账单
+                viewModel.mainBillId.value = billInfoArg!!.billId
+                viewModel.oldRelatedBill.observe(viewLifecycleOwner) {
+                    if (it != null) {
+                        Log.d("oldRelatedBill", it.toString())
+                        viewModel.newRelatedBillId.value = it.billId
+                    }
+                    viewModel.oldRelatedBill.removeObservers(viewLifecycleOwner)
+                }
+                relateAccountBtn.setOnClickListener {
+                    val balance = balanceText.text.toString().toDoubleOrNull()
+                    if (balance != null && balance != 0.0) {
+
+                        Log.d("Click", Util.balanceFormatter.format(balance))
+                        Log.d("Click", relatedAccountType.toString())
+                        val action = EditBillFragmentDirections.attachRefundBillAction(Util.balanceFormatter.format(balance), relatedAccountType)
+                        findNavController().navigate(action)
+                    } else {
+                        Toast.makeText(requireContext(), "请先填写金额", Toast.LENGTH_SHORT).show()
+                    }
+                }
             } else {
                 Log.d("action", "关联退款账单")
-                relateAccountBtn.text = "选择退款/报销的订单"
-                // todo 选择需要关联的账单
+                relateAccountBtn.setOnClickListener {
+                    val balance = balanceText.text.toString().toDoubleOrNull()
+                    if (balance != null && balance != 0.0) {
+
+                        Log.d("Click", Util.balanceFormatter.format(balance))
+                        Log.d("Click", relatedAccountType.toString())
+                        val action = EditBillFragmentDirections.attachRefundBillAction(Util.balanceFormatter.format(balance), relatedAccountType)
+                        findNavController().navigate(action)
+                    } else {
+                        Toast.makeText(requireContext(), "请先填写金额", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
         // 可关联账户
@@ -215,7 +314,12 @@ class IncomeBillFragment : Fragment() {
         }
         viewModel.relatedAccount.observe(viewLifecycleOwner) {
             if (it != null) {
-                relateAccountBtn.text = it.name
+                val relatedAccountType = viewModel.categoryView.value?.relatedAccountType
+                if (relatedAccountType == MainAccountType.REFUND || relatedAccountType == MainAccountType.REIMBURSEMENT) {
+                    relateAccountBtn.text = "选择退款/报销的订单"
+                } else {
+                    relateAccountBtn.text = it.name
+                }
             }
         }
     }
@@ -224,25 +328,41 @@ class IncomeBillFragment : Fragment() {
         val balance = balanceText.text.toString().toDoubleOrNull()
         if (balance != null && balance != 0.0) {
             val newBill = Bill(
-                viewModel.newDateTime,
-                viewModel.categoryView.value?.id!!,
-                null,
-                remarkText.text.toString(),
-                null,
-                null,
-                balance,
-                viewModel.accountId.value,
-                0.0,
-                balance,
-                Source.MANUAL,
-                Visible.ENABLED
+                    viewModel.newDateTime,
+                    viewModel.categoryView.value?.id!!,
+                    null,
+                    remarkText.text.toString(),
+                    null,
+                    null,
+                    balance,
+                    viewModel.accountId.value,
+                    0.0,
+                    balance,
+                    Source.MANUAL,
+                    Visible.ENABLED
             )
-            if (relateAccountBtn.visibility == View.VISIBLE) {
-                Log.d("data", viewModel.relatedAccount.value.toString())
+            val relatedAccountType = viewModel.categoryView.value?.relatedAccountType
+            if (relatedAccountType != null) {
+                Log.d("data, relatedAccount", viewModel.relatedAccount.value.toString())
                 newBill.apply {
                     outAccount = viewModel.relatedAccountId.value
                     outMoney = newBill.inMoney
                     income = 0.0
+                }
+            }
+            viewModel.relatedBillView.value?.let { relatedBillView ->
+                viewModel.categoryView.value?.let {
+                    Log.d("related", "有关联的账单：$relatedBillView")
+                    newBill.outMoney = newBill.inMoney
+                    newBill.income = 0.0
+                    when (it.relatedAccountType) {
+                        MainAccountType.REIMBURSEMENT -> {
+                            newBill.outAccount = relatedBillView.inAccountId
+                        }
+                        MainAccountType.REFUND -> {
+                            newBill.outAccount = Constants.defaultAccountMap[MainAccountType.REFUND]
+                        }
+                    }
                 }
             }
             Log.d("data", newBill.toString())
@@ -269,65 +389,32 @@ class IncomeBillFragment : Fragment() {
             if (bill != null) {
                 if (billInfoArg != null) { // 修改
                     bill.billId = billInfoArg!!.billId
-                    thread {
-                        viewModel.billDao.updateBill(bill)
-                        setNewBalance(
-                            billInfoArg?.outMoney,
-                            bill.outMoney,
-                            billInfoArg?.inMoney,
-                            bill.inMoney,
-                            bill.outAccount,
-                            bill.inAccount
-                        )
-                    }
+                    viewModel.modifyBill(bill, billInfoArg!!)
                     findNavController().navigateUp()
                 } else { // 再记一笔
                     balanceText.setText("")
                     (requireActivity() as OverviewActivity).vibratePhone()
                     Toast.makeText(requireContext(), "添加成功", Toast.LENGTH_SHORT).show()
-                    thread {
-                        viewModel.billDao.insertBill(bill)
-                        setNewBalance(
-                            null,
-                            bill.outMoney,
-                            null,
-                            bill.inMoney,
-                            bill.outAccount,
-                            bill.inAccount
-                        )
-                    }
+                    viewModel.addBill(bill)
                 }
             }
         }
-        // 删除或者保存
+        // 删除或者添加
         deleteBtn.setOnClickListener {
             if (billInfoArg != null) { // 删除
-                thread {
-                    viewModel.billDao.deleteBill(billInfoArg!!.billId)
-                    setNewBalance(
-                        billInfoArg?.outMoney,
-                        0.00,
-                        billInfoArg?.inMoney,
-                        0.00,
-                        billInfoArg?.outAccountId,
-                        billInfoArg?.inAccountId
-                    )
+                if (viewModel.relatedBillView.value == null) {
+                    viewModel.deleteBill(billInfoArg!!.toBill())
+                    findNavController().navigateUp()
+                } else {
+                    MaterialAlertDialogBuilder(requireContext())
+                            .setTitle("更改分类需要先取消关联的账单")
+                            .setPositiveButton("确定") { _, _ -> }
+                            .show()
                 }
-                findNavController().navigateUp()
-            } else { // 保存
+            } else { // 添加
                 val bill = collectData()
                 if (bill != null) {
-                    thread {
-                        viewModel.billDao.insertBill(bill)
-                        setNewBalance(
-                            null,
-                            bill.outMoney,
-                            null,
-                            bill.inMoney,
-                            bill.outAccount,
-                            bill.inAccount
-                        )
-                    }
+                    viewModel.addBill(bill)
                     findNavController().navigateUp()
                 }
             }
@@ -354,7 +441,6 @@ class IncomeBillFragment : Fragment() {
             balanceText.setText(billInfoArg!!.inMoney.toString())
             if (billInfoArg!!.outAccountMainAccountType != null && billInfoArg!!.outAccountMainAccountType == MainAccountType.REFUND) {
                 Log.d("action", "设置退款关联账单")
-                // todo 关联账单
             } else if (billInfoArg!!.outAccountMainAccountType != null && billInfoArg!!.outAccountMainAccountType != MainAccountType.REFUND) {
                 Log.d("action", "设置其他关联账户")
                 relateAccountBtn.visibility = View.VISIBLE
@@ -379,30 +465,6 @@ class IncomeBillFragment : Fragment() {
         setDateCard()
         setRemarkCard()
         setBtn()
-
-    }
-
-    private fun setNewBalance(
-        oldOutMoney: Double?,
-        newOutMoney: Double?,
-        oldInMoney: Double?,
-        newInMoney: Double?,
-        outAccountId: Long?,
-        inAccountId: Long?
-    ) {
-        val inDifference = (newInMoney ?: 0.00) - (oldInMoney ?: 0.00)
-        val outDifference = (newOutMoney ?: 0.00) - (oldOutMoney ?: 0.00)
-        if (inDifference != 0.00) inAccountId?.let {
-            viewModel.accountDao.updateAccountBalance(
-                it,
-                inDifference
-            )
-        }
-        if (outDifference != 0.00) outAccountId?.let {
-            viewModel.accountDao.updateAccountBalance(
-                it,
-                -outDifference
-            )
-        }
+        setRelatedBillCard()
     }
 }

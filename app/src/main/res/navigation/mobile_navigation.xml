@@ -59,6 +59,16 @@
         <action
             android:id="@+id/selectAccountAction"
             app:destination="@id/accountDialog" />
+        <argument
+            android:name="mainBillId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+        <action
+            android:id="@+id/splitBillAction"
+            app:destination="@id/splitBillFragment" />
+        <action
+            android:id="@+id/attachRefundBillAction"
+            app:destination="@id/refundBillFragment" />
     </fragment>
     <fragment
         android:id="@+id/pieChartFragment"
@@ -181,7 +191,14 @@
         android:id="@+id/splitBillFragment"
         android:name="cn.coegle18.smallsteps.fragment.SplitBillFragment"
         android:label="拆分账单"
-        tools:layout="@layout/fragment_split_bill" />
+        tools:layout="@layout/fragment_split_bill">
+        <argument
+            android:name="billId"
+            app:argType="long" />
+        <action
+            android:id="@+id/editSplitAction"
+            app:destination="@id/editBillFragment" />
+    </fragment>
     <fragment
         android:id="@+id/subAddAssetsFragment"
         android:name="cn.coegle18.smallsteps.fragment.SubAddAssetsFragment"
@@ -261,4 +278,16 @@
             android:name="accountId"
             app:argType="long" />
     </dialog>
+    <fragment
+        android:id="@+id/refundBillFragment"
+        android:name="cn.coegle18.smallsteps.fragment.RefundBillFragment"
+        android:label="关联账单"
+        tools:layout="@layout/fragment_refund_bill">
+        <argument
+            android:name="balance"
+            app:argType="string" />
+        <argument
+            android:name="refundType"
+            app:argType="cn.coegle18.smallsteps.MainAccountType" />
+    </fragment>
 </navigation>

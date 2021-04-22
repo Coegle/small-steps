@@ -8,7 +8,6 @@
         android:id="@+id/relatedBillText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:text="已关联账单"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
         android:visibility="visible"
