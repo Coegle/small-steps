@@ -19,14 +19,18 @@ class NJUSTScraper(private val userId: String,
                    handler: Handler,
                    private val oldLatestTime: OffsetDateTime?) {
     companion object {
-        private const val loginUrl = "http://ids.njust.edu.cn/authserver/login?service=http%3A%2F%2Fehall.njust.edu.cn%2Flogin%3F"
-        private const val getJSessionIdUrl = "http://ehall.njust.edu.cn/jsonp/userDesktopInfo.json?type=&_=1603869736672"
+        private const val loginUrl =
+            "http://ids.njust.edu.cn/authserver/login?service=http%3A%2F%2Fehall.njust.edu.cn%2Flogin%3F"
+        private const val getJSessionIdUrl =
+            "http://ehall.njust.edu.cn/jsonp/userDesktopInfo.json?type=&_=1603869736672"
         private const val queryUrl = "http://ehall.njust.edu.cn/appShow?appId=06001601040002"
         private const val loginInSucceedUrl = "http://ehall.njust.edu.cn/new/index.html"
 
         private const val dropDownList = "3"
         private const val eventTarget = "dlconsume"
         private const val eventArgument = "Page$"
+        private const val pageLast = "Last"
+        private const val pageFirst = "First"
         const val errorPassMsg = "用户名或者密码有误"
     }
 
@@ -39,7 +43,7 @@ class NJUSTScraper(private val userId: String,
         client = clientBuilder.build()
     }
 
-    private fun buildParamsToPaging(body: String, page: Int): FormBody {
+    private fun buildParamsToPaging(body: String, page: Int, pageParam: String = ""): FormBody {
         val doc = Jsoup.parse(body)
         val viewState = doc.select("#__VIEWSTATE").`val`()
         val eventValidation = doc.select("#__EVENTVALIDATION").`val`()
@@ -53,6 +57,12 @@ class NJUSTScraper(private val userId: String,
             formBuilder.apply {
                 add("__EVENTTARGET", eventTarget)
                 add("__EVENTARGUMENT", eventArgument + page)
+            }
+        }
+        if (pageParam != "") {
+            formBuilder.apply {
+                add("__EVENTTARGET", eventTarget)
+                add("__EVENTARGUMENT", pageParam)
             }
         }
         return formBuilder.build()
@@ -118,14 +128,74 @@ class NJUSTScraper(private val userId: String,
 
     }
 
+    // 去第一页
+    private fun goToFirstPage(formBody: FormBody, url: String, pageNum: Int) {
+        val request = Request.Builder()
+            .url(url)
+            .post(formBody)
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                messageUtil.sendMessage(States.GET_TOTAL_PAGES_FAILED)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                messageUtil.sendMessage(States.GET_TOTAL_PAGES_SUCCESS)
+                Log.d("scraper", "**queryPage: $pageNum")
+                val responseBody = response.body?.string()
+                if (responseBody != null) {
+                    // Log.d("scraper", "**Query 30 days bills response body: ${response.body?.string()}")
+                    val needMore = parseBills(responseBody, isFinished = false, isFirstPage = true)
+                    if (needMore) {
+                        pageNum.let {
+                            val nextRequestFormBody = buildParamsToPaging(responseBody, 2)
+                            queryEachPage(2, pageNum, nextRequestFormBody, url)
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    // 去最后一页，获取页数
+    private fun getPageNum(formBody: FormBody, url: String) {
+        val request = Request.Builder()
+            .url(url)
+            .post(formBody)
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                messageUtil.sendMessage(States.GET_TOTAL_PAGES_FAILED)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                messageUtil.sendMessage(States.GET_TOTAL_PAGES_SUCCESS)
+                Log.d("scraper", "**Query 30 days bills response: $response")
+                val responseBody = response.body?.string()
+                if (responseBody != null) {
+                    Log.d("scraper", "**Query LastPage response body: ${responseBody}")
+                    val page =
+                        Jsoup.parse(responseBody).select("#dlconsume > tbody")?.last()?.text()
+                            ?.split(" ")?.last()
+                    val pageNum = page?.toIntOrNull()
+                    Log.d("scraper", "PageNum :$page")
+                    val nextRequestFormBody =
+                        buildParamsToPaging(responseBody, -1, eventArgument + pageFirst)
+                    if (pageNum != null) {
+                        goToFirstPage(nextRequestFormBody, url, pageNum)
+                    }
+                }
+            }
+        })
+    }
 
     // 查询过去 30 天的账单，得到总页数
     private fun queryLast30DaysBill(formBody: FormBody, url: String) {
         messageUtil.sendMessage(States.GET_TOTAL_PAGES_PROGRESSING)
         val request = Request.Builder()
-                .url(url)
-                .post(formBody)
-                .build()
+            .url(url)
+            .post(formBody)
+            .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 messageUtil.sendMessage(States.GET_TOTAL_PAGES_FAILED)
@@ -137,12 +207,23 @@ class NJUSTScraper(private val userId: String,
                 val responseBody = response.body?.string()
                 if (responseBody != null) {
                     // Log.d("scraper", "**Query 30 days bills response body: ${response.body?.string()}")
-                    val pageNum = Jsoup.parse(responseBody).select("#dlconsume > tbody > tr:nth-child(17) > td > font > table > tbody > tr > td")?.last()?.text()?.toInt()
-                    val needMore = parseBills(responseBody, pageNum == null, true)
-                    if (needMore) {
-                        pageNum?.let {
-                            val nextRequestFormBody = buildParamsToPaging(responseBody, 2)
-                            queryEachPage(2, pageNum, nextRequestFormBody, url)
+                    val page = Jsoup.parse(responseBody)
+                        .select("#dlconsume > tbody > tr:nth-child(17) > td > font > table > tbody > tr > td")
+                        ?.last()?.text()
+                    val pageNum = page?.toIntOrNull()
+                    if (pageNum == null) { // >> 的方法：去最后一页
+                        val nextRequestBody =
+                            buildParamsToPaging(responseBody, -1, eventArgument + pageLast)
+                        Log.d("scraper", "GetPageNum")
+                        getPageNum(nextRequestBody, url)
+                    } else {
+                        val needMore =
+                            parseBills(responseBody, isFinished = false, isFirstPage = true)
+                        if (needMore) {
+                            pageNum.let {
+                                val nextRequestFormBody = buildParamsToPaging(responseBody, 2)
+                                queryEachPage(2, pageNum, nextRequestFormBody, url)
+                            }
                         }
                     }
                 }
