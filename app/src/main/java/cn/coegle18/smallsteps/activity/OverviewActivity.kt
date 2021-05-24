@@ -1,10 +1,14 @@
 package cn.coegle18.smallsteps.activity
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
@@ -14,8 +18,10 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import cn.coegle18.smallsteps.AppDatabase
 import cn.coegle18.smallsteps.R
+import cn.coegle18.smallsteps.util.CSVHelper
 import kotlinx.android.synthetic.main.activity_overview.*
 import kotlinx.android.synthetic.main.drawer_left.*
+import kotlin.concurrent.thread
 
 class OverviewActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -59,6 +65,22 @@ class OverviewActivity : AppCompatActivity() {
                     navController.navigate(R.id.categoryFragment)
                     true
                 }
+                R.id.navigation_export -> {
+                    thread {
+                        Looper.prepare()
+                        val list =
+                            AppDatabase.getDatabase(applicationContext).billDao().simpleQuery()
+                        Log.d("list", list.subList(0, 1).toString())
+                        if (CSVHelper.saveTextFile(applicationContext, list)) {
+                            toast("成功导出至 Download 文件夹")
+                        } else {
+                            toast("导出失败")
+                        }
+                        Looper.loop()
+                    }
+                    drawer_layout.closeDrawers()
+                    true
+                }
                 else -> true
             }
         }
@@ -83,4 +105,8 @@ class OverviewActivity : AppCompatActivity() {
         val vibrator = applicationContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         vibrator.vibrate(VibrationEffect.createOneShot(time, VibrationEffect.DEFAULT_AMPLITUDE))
     }
+}
+
+fun Activity.toast(s: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(this, s, duration).show()
 }
