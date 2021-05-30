@@ -132,6 +132,11 @@ class HProgressView : View {
     }
 
     fun setProgress(progress: Float) = setProgress(progress, withAnim)
+    fun setProgressColor(color: Int) {
+        progressColor = color
+        progressPaint.color = progressColor
+        invalidate()
+    }
 
     private fun setProgress(progress: Float, withAnim: Boolean) {
         if (progress < 0) mProgress = 0f
