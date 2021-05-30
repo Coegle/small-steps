@@ -7,6 +7,7 @@ import cn.coegle18.smallsteps.entity.NJUSTBill
 import okhttp3.*
 import org.jsoup.Jsoup
 import java.io.IOException
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
@@ -40,7 +41,10 @@ class NJUSTScraper(private val userId: String,
     init {
         val clientBuilder = OkHttpClient.Builder()
         clientBuilder.cookieJar(MyCookieJar())
-        client = clientBuilder.build()
+        client = clientBuilder
+            .connectTimeout(Duration.ZERO)
+            .readTimeout(Duration.ZERO)
+            .build()
     }
 
     private fun buildParamsToPaging(body: String, page: Int, pageParam: String = ""): FormBody {
@@ -165,20 +169,21 @@ class NJUSTScraper(private val userId: String,
             .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                Log.d("scraper", "$e")
                 messageUtil.sendMessage(States.GET_TOTAL_PAGES_FAILED)
             }
 
             override fun onResponse(call: Call, response: Response) {
                 messageUtil.sendMessage(States.GET_TOTAL_PAGES_SUCCESS)
-                Log.d("scraper", "**Query 30 days bills response: $response")
+                Log.d("scraper", "**Query LastPage response response: $response")
                 val responseBody = response.body?.string()
                 if (responseBody != null) {
-                    Log.d("scraper", "**Query LastPage response body: ${responseBody}")
+                    Log.d("scraper", "**Query LastPage response body: $responseBody")
                     val page =
                         Jsoup.parse(responseBody).select("#dlconsume > tbody")?.last()?.text()
                             ?.split(" ")?.last()
                     val pageNum = page?.toIntOrNull()
-                    Log.d("scraper", "PageNum :$page")
+                    Log.d("scraper", "**PageNum :$page")
                     val nextRequestFormBody =
                         buildParamsToPaging(responseBody, -1, eventArgument + pageFirst)
                     if (pageNum != null) {
@@ -206,15 +211,15 @@ class NJUSTScraper(private val userId: String,
                 Log.d("scraper", "**Query 30 days bills response: $response")
                 val responseBody = response.body?.string()
                 if (responseBody != null) {
-                    // Log.d("scraper", "**Query 30 days bills response body: ${response.body?.string()}")
+                    Log.d("scraper", "**Query 30 days bills response body: $responseBody")
                     val page = Jsoup.parse(responseBody)
                         .select("#dlconsume > tbody > tr:nth-child(17) > td > font > table > tbody > tr > td")
                         ?.last()?.text()
                     val pageNum = page?.toIntOrNull()
                     if (pageNum == null) { // >> 的方法：去最后一页
+                        Log.d("scraper", "需要使用 >> 获取页数")
                         val nextRequestBody =
                             buildParamsToPaging(responseBody, -1, eventArgument + pageLast)
-                        Log.d("scraper", "GetPageNum")
                         getPageNum(nextRequestBody, url)
                     } else {
                         val needMore =
@@ -367,11 +372,11 @@ class MyCookieJar : CookieJar {
         for (cookie in cookies) {
             cookiesMap[cookie.name] = cookie
         }
-        Log.d("scraper", "-saved cookies: $cookiesMap")
+        //Log.d("scraper", "-saved cookies: $cookiesMap")
     }
 
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
-        Log.d("scraper", "-using cookies: $cookiesMap")
+        //Log.d("scraper", "-using cookies: $cookiesMap")
         return cookiesMap.toList().map { it.second }
     }
 }
